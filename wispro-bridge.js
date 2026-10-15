@@ -1,8 +1,7 @@
-// wispro-bridge.js - Inicialización autónoma conectada a Firestore (100% Gratis y Estable)
+// wispro-bridge.js - Versión Final Blindada contra campos vacíos (Firestore)
 (function() {
   let LOCAL_WISPRO_DATABASE = [];
 
-  // Tus credenciales oficiales del proyecto ticket-fcce5
   const firebaseConfigBridge = {
     apiKey: "AIzaSyBz8UMEOOZ9n6unW-n_xXlnBv1XqdWVDfU",
     authDomain: "://firebaseapp.com",
@@ -12,13 +11,10 @@
     appId: "1:597575091640:web:3f5861be323276bc05bb4d"
   };
 
-  // Función interna para asegurar que Firestore esté disponible de forma aislada
   function obtenerFirestoreAislado() {
     if (typeof firebase === "undefined") {
       throw new Error("Las librerías de Firebase no están cargadas en la página web.");
     }
-    
-    // Si ya existe una app secundaria del puente la usamos, sino la inicializamos de forma única
     let appBridge = firebase.apps.find(app => app.name === "wisproBridgeApp");
     if (!appBridge) {
       appBridge = firebase.initializeApp(firebaseConfigBridge, "wisproBridgeApp");
@@ -27,6 +23,7 @@
   }
 
   function vincularAcciones() {
+    // Escuchamos el nuevo botón modificado en tu HTML grande
     const nuevoBoton = document.getElementById("btn-sincro-nuevo");
     if (!nuevoBoton || nuevoBoton.dataset.vinculado) return;
 
@@ -38,10 +35,7 @@
       if (statusBox) statusBox.textContent = "⏳ Conectando de forma segura con la base de datos Firestore...";
 
       try {
-        // Obtenemos la instancia aislada de Firestore de forma segura
         const db = obtenerFirestoreAislado();
-
-        // Leemos la colección espejo donde se almacenan tus abonados
         const snapshot = await db.collection("clientes_wispro").get();
         
         if (snapshot.empty) {
@@ -55,9 +49,11 @@
 
         const mensajeExito = `✅ Éxito: Se cargaron ${LOCAL_WISPRO_DATABASE.length} clientes desde tu base de datos Firestore.`;
         if (statusBox) statusBox.textContent = mensajeExito;
+        
+        // Cartel flotante obligatorio de alerta en pantalla
         alert(mensajeExito);
 
-        // Alimentar datalist original 'dl' de tu formulario para habilitar el autocompletado
+        // Alimentar datalist original 'dl' de tu formulario
         const dl = document.getElementById("dl");
         if (dl) {
           dl.innerHTML = "";
@@ -108,7 +104,7 @@
       });
     }
 
-    // Inyectar campo Enlace de Ticket
+    // Inyectar el campo Ticket Link
     const txtProblema = document.getElementById("prob");
     if (txtProblema && !document.getElementById("w-ticket-url-input")) {
       const ticketWrapper = document.createElement("div");
