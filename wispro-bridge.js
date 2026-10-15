@@ -1,6 +1,5 @@
-// wispro-bridge.js - Consulta directa a Wispro Cloud API (100% Gratis sin Firebase Functions)
+// wispro-bridge.js - Consulta directa a Wispro Cloud API (Corregido y Validado)
 (function() {
-  // Tu token real de Wispro inyectado para operar directo en el navegador
   const WISPRO_TOKEN = "a44144de-a97e-4bdb-bba7-1a6391565c91";
   const BASE_URL = "https://wispro.co";
   let LOCAL_WISPRO_DATABASE = [];
@@ -60,7 +59,6 @@
       if (statusBox) statusBox.textContent = "⏳ Conectando de forma directa con Wispro Cloud API...";
 
       try {
-        // Consultamos directo las dos colecciones que necesitamos en paralelo
         const [clients, contracts] = await Promise.all([
           getAll("clients"),
           getAll("contracts"),
@@ -205,3 +203,6 @@
     wrapper.innerHTML = html;
   }
 
+  vincularAcciones();
+  setInterval(vincularAcciones, 1000);
+})();
