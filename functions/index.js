@@ -78,20 +78,26 @@ export const obtenerDatosWispro = onRequest({ cors: true }, async (req, res) => 
     
     const contractsByClient = new Map();
 
-    for (const c of contracts) {
-      if (c.client_id == null) continue;
-      const key = String(c.client_id);
-      if (!contractsByClient.has(key)) contractsByClient.set(key, []);
-      contractsByClient.get(key).push({
-        node_name: c.node_name || "Servidor Principal",
-        ip: c.ip || "IP Dinámica"
-      });
+    // Validación estricta para evitar NetworkError si contracts viene vacío o nulo
+    if (Array.isArray(contracts)) {
+      for (const c of contracts) {
+        if (!c || c.client_id == null) continue;
+        const key = String(c.client_id);
+        if (!contractsByClient.has(key)) contractsByClient.set(key, []);
+        contractsByClient.get(key).push({
+          node_name: c.node_name || "Servidor Principal",
+          ip: c.ip || "IP Dinámica"
+        });
+      }
     }
 
     const normalized = clients.map(c => {
       const id = val(c.id, c.uuid, c.client_id);
+      
+      // Búsqueda segura de contratos por cliente
       const associated = id == null ? [] : (contractsByClient.get(String(id)) || []);
       const firstContract = associated[0] || {};
+      
       return {
         wisproId: id == null ? null : String(id),
         nombre: String(val(c.name, c.full_name, c.business_name, "Cliente sin nombre")),
