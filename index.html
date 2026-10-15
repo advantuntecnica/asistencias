@@ -100,6 +100,13 @@ em{font-size:10px;color:var(--mut)}
  <div class="card"><b>Importar desde Wispro Cloud</b>
   <p class="mut">Consulta clientes, contratos y planes de Wispro. Los clientes importados se guardan en esta aplicación con un identificador propio de Wispro para poder sincronizarlos nuevamente.</p>
   <div class="row"><button class="pri" id="btn-sincro-nuevo">🔄 Importar / sincronizar desde Wispro</button>
+   <div class="row">
+  <button class="pri" id="btn-sincro-nuevo">🔄 Importar / sincronizar desde Wispro</button>
+  <button data-act="wispro-json">Descargar JSON</button>
+</div>
+<!-- AGREGÁ ESTA NUEVA LÍNEA ACÁ ABAJO -->
+<p id="wispro-st-nuevo" class="mut" style="font-weight: bold; color: var(--ac); margin-top: 8px;"></p>
+
 <button data-act="wispro-json">Descargar JSON</button></div>
   <p id="wispro-st" class="mut" aria-live="polite"></p>
  </div>
