@@ -1,4 +1,7 @@
 {
+  "projects": {
+    "default": "ticket-fcce5"
+  },
   "functions": {
     "source": "functions"
   }
