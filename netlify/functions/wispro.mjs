@@ -1,0 +1,162 @@
+import admin from "firebase-admin";
+
+const BASE_URL = "https://www.cloud.wispro.co/api/v1/clients";
+
+function response(statusCode, body) {
+  return {
+    statusCode,
+    headers: {
+      "Content-Type": "application/json; charset=utf-8",
+      "Cache-Control": "no-store",
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, Accept, Authorization",
+    },
+    body: JSON.stringify(body),
+  };
+}
+
+function firebaseAdmin() {
+  if (admin.apps.length) return admin.app();
+  const raw = process.env.FIREBASE_SERVICE_ACCOUNT;
+  if (!raw) throw new Error("Falta configurar FIREBASE_SERVICE_ACCOUNT en Netlify.");
+  const serviceAccount = JSON.parse(raw);
+  return admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+  });
+}
+
+async function requireAdmin(event) {
+  const authHeader = event.headers?.authorization || event.headers?.Authorization || "";
+  const match = authHeader.match(/^Bearer\s+(.+)$/i);
+  if (!match) throw new Error("No autenticado. Volvé a ingresar a la aplicación.");
+  const app = firebaseAdmin();
+  const decoded = await app.auth().verifyIdToken(match[1]);
+  const userDoc = await app.firestore().doc(`usuarios/${decoded.uid}`).get();
+  if (!userDoc.exists || userDoc.data()?.rol !== "admin") {
+    throw new Error("Acceso denegado: se requiere una cuenta administradora.");
+  }
+  return true;
+}
+
+async function getAll(resource, token) {
+  const all = [];
+  let page = 1;
+  while (true) {
+    const url = new URL(`${BASE_URL}/${resource}`);
+    url.searchParams.set("page", String(page));
+    url.searchParams.set("per_page", "100");
+    const res = await fetch(url, {
+      method: "GET",
+      headers: { Authorization: token, Accept: "application/json" },
+    });
+    const json = await res.json().catch(() => null);
+    if (!res.ok) throw new Error(`Wispro ${resource}: HTTP ${res.status}`);
+    if (!json || typeof json !== "object") throw new Error(`Wispro ${resource}: respuesta JSON inválida`);
+    if (json.status && Number(json.status) !== 200) {
+      throw new Error(`Wispro ${resource}: ${json.message || `status ${json.status}`}`);
+    }
+    const data = Array.isArray(json) ? json : json.data;
+    if (!Array.isArray(data)) throw new Error(`Wispro ${resource}: no se encontró la lista data`);
+    all.push(...data);
+    const pagination = json.meta?.pagination;
+    if (pagination?.total_pages != null) {
+      if (page >= Number(pagination.total_pages)) break;
+    } else if (data.length < 100) {
+      break;
+    }
+    if (data.length === 0) break;
+    page += 1;
+    if (page > 10000) throw new Error(`Wispro ${resource}: paginación excesiva`);
+  }
+  return all;
+}
+
+const val = (...values) => values.find(v => v !== undefined && v !== null && String(v).trim() !== "");
+
+export const handler = async (event) => {
+  if (event.httpMethod === "OPTIONS") return response(204, {});
+  if (event.httpMethod !== "GET") return response(405, { error: "Método no permitido" });
+
+  try {
+    await requireAdmin(event);
+  } catch (err) {
+    const msg = err?.message || "No autorizado.";
+    const status = msg.includes("Acceso denegado") ? 403 : 401;
+    return response(status, { error: msg });
+  }
+
+  const token = process.env.WISPRO_TOKEN;
+  if (!token) return response(500, { error: "Falta configurar WISPRO_TOKEN en las variables de entorno de Netlify." });
+
+  try {
+    const [clients, contracts, plans] = await Promise.all([
+      getAll("clients", token),
+      getAll("contracts", token),
+      getAll("plans", token),
+    ]);
+    const plansById = new Map(plans.map(p => [String(p.id), p]));
+    const contractsByClient = new Map();
+
+    for (const c of contracts) {
+      if (c.client_id == null) continue;
+      const key = String(c.client_id);
+      if (!contractsByClient.has(key)) contractsByClient.set(key, []);
+      const plan = plansById.get(String(c.plan_id));
+      contractsByClient.get(key).push({
+        id: c.id ?? null,
+        public_id: c.public_id ?? null,
+        client_id: c.client_id,
+        plan_id: c.plan_id ?? null,
+        plan_name: val(plan?.name, plan?.title, ""),
+        state: c.state ?? "",
+        ip: c.ip ?? "",
+        netmask: c.netmask ?? "",
+        mac_address: c.mac_address ?? "",
+        server_configuration_id: c.server_configuration_id ?? null,
+        node_id: c.node_id ?? null,
+        node_name: c.node_name ?? "",
+        address: [
+          val(c.address_street, ""),
+          val(c.address_number, ""),
+          val(c.address_city, ""),
+          val(c.address_state, ""),
+        ].filter(Boolean).join(" "),
+        latitude: c.latitude ?? null,
+        longitude: c.longitude ?? null,
+      });
+    }
+
+    const normalized = clients.map(c => {
+      const id = val(c.id, c.uuid, c.client_id);
+      const associated = id == null ? [] : (contractsByClient.get(String(id)) || []);
+      const firstContract = associated[0] || {};
+      const firstPlan = plansById.get(String(firstContract.plan_id)) || {};
+      const clientAddress = val(c.address, [c.street, c.number].filter(Boolean).join(" "), "");
+      return {
+        wisproId: id == null ? null : String(id),
+        nombre: String(val(c.name, c.full_name, c.business_name, c.legal_name, "Cliente sin nombre")),
+        direccion: String(val(clientAddress, firstContract.address, "")),
+        telefono: String(val(c.phone, c.phone_mobile, c.mobile_phone, "")),
+        email: String(val(c.email, c.tmp_email, "")),
+        documento: String(val(c.national_identification_number, "")),
+        cuit: String(val(c.taxpayer_identification_number, "")),
+        plan: String(val(firstContract.plan_name, firstPlan.name, firstPlan.title, "")),
+        contratos: associated,
+        datos_personales: c,
+      };
+    });
+
+    return response(200, {
+      origen: "Wispro Cloud API",
+      total_clientes: normalized.length,
+      total_contratos: contracts.length,
+      total_planes: plans.length,
+      clientes: normalized,
+      planes,
+    });
+  } catch (err) {
+    console.error("Wispro API error:", err?.message || err);
+    return response(502, { error: err?.message || "No se pudo consultar Wispro." });
+  }
+};

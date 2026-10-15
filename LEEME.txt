@@ -1,0 +1,32 @@
+INTEGRACIÓN WISPRO CLOUD — ASISTENCIAS TÉCNICAS
+
+Archivos:
+- index.html: aplicación original con la opción “Importar desde Wispro Cloud”.
+- netlify/functions/wispro.mjs: función backend que consulta clientes, contratos y planes, protegida para administradores de Firebase.
+- netlify.toml: configuración de funciones Netlify.
+- package.json: dependencia firebase-admin para validar la sesión.
+
+CONFIGURACIÓN
+1. Copiá estos archivos a tu proyecto existente, conservando los demás archivos originales (firebase-config.js, manifest.webmanifest, sw.js, iconos, etc.).
+2. En Netlify, abrí la configuración del sitio y buscá Environment variables.
+3. Creá `WISPRO_TOKEN` con el API Token de Wispro.
+4. Creá `FIREBASE_SERVICE_ACCOUNT` con el JSON completo de una cuenta de servicio de Firebase Admin SDK. En Firebase Console: Configuración del proyecto → Cuentas de servicio → Generar nueva clave privada. Copiá el contenido JSON completo como valor de la variable. No subas esa clave al repositorio ni al frontend.
+5. Guardá y hacé un nuevo deploy.
+6. Ingresá a la aplicación con una cuenta administradora, abrí Clientes y tocá “Importar / sincronizar desde Wispro”.
+7. “Descargar JSON” permite descargar los datos consultados después de la sincronización.
+
+FUNCIONAMIENTO
+- Lee los endpoints GET `/clients`, `/contracts` y `/plans`, con paginación de 100.
+- No escribe ni modifica nada en Wispro.
+- Importa en Firestore clientes con ID local estable `wispro_<id>`. Una nueva sincronización actualiza esos registros y no duplica esos clientes.
+- Los contratos relacionados se guardan dentro del registro del cliente para mostrar IP, MAC, estado y plan.
+- Los clientes creados manualmente conservan sus IDs.
+
+SEGURIDAD
+- La función exige un ID token de Firebase válido y verifica en Firestore que `usuarios/<uid>` tenga `rol: "admin"`.
+- El token de Wispro y la clave de Firebase Admin quedan en variables de entorno de Netlify, nunca en el navegador.
+- Revisá también las reglas de Firestore para limitar los datos a usuarios autorizados.
+- La cuenta de servicio de Firebase es una credencial privilegiada. Guardala solo en Netlify y no la compartas.
+
+IMPORTANTE
+La API real de Wispro debe validar la forma exacta de los campos que devuelve tu cuenta. El mapeo contempla campos comunes de clientes, contratos y planes. Tras la primera sincronización, verificá los totales y algunos registros.
