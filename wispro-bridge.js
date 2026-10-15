@@ -1,22 +1,27 @@
-// wispro-bridge.js - Consulta directa a Wispro Cloud API (Corregido y Validado)
+// wispro-bridge.js - Consulta a Wispro Cloud API vía Proxy Gratuito (Sin Firebase Functions)
 (function() {
   const WISPRO_TOKEN = "a44144de-a97e-4bdb-bba7-1a6391565c91";
-  const BASE_URL = "https://wispro.co";
+  
+  // Usamos un proxy CORS gratuito para que el navegador no bloquee la petición
+  const PROXY_URL = "https://herokuapp.com";
+  const TARGET_URL = "https://wispro.co";
   let LOCAL_WISPRO_DATABASE = [];
 
   async function getAll(resource) {
     const all = [];
     let page = 1;
     while (true) {
-      const url = new URL(`${BASE_URL}/${resource}`);
+      const url = new URL(`${TARGET_URL}/${resource}`);
       url.searchParams.set("page", String(page));
       url.searchParams.set("per_page", "100");
       
-      const res = await fetch(url.href, {
+      // Combinamos el proxy con la URL de destino
+      const res = await fetch(PROXY_URL + url.href, {
         method: "GET",
         headers: { 
           "Authorization": WISPRO_TOKEN, 
-          "Accept": "application/json" 
+          "Accept": "application/json",
+          "X-Requested-With": "XMLHttpRequest"
         },
       });
       
@@ -56,7 +61,7 @@
       e.preventDefault();
       
       const statusBox = document.getElementById("wispro-st-nuevo");
-      if (statusBox) statusBox.textContent = "⏳ Conectando de forma directa con Wispro Cloud API...";
+      if (statusBox) statusBox.textContent = "⏳ Conectando vía Proxy con Wispro Cloud API...";
 
       try {
         const [clients, contracts] = await Promise.all([
@@ -115,11 +120,11 @@
       } catch (err) {
         console.error(err);
         if (statusBox) statusBox.textContent = `❌ Error: ${err.message}`;
-        alert(`❌ Error al importar: ${err.message}`);
+        alert(`❌ Error al importar: ${err.message}. Asegurate de activar el acceso temporal en ://herokuapp.com si es la primera vez.`);
       }
     });
 
-    // Inyectar Buscador Global Reactivo en la pestaña principal
+    // Inyectar Buscador Global
     const sAsist = document.getElementById("s-asist");
     if (sAsist && !document.getElementById("w-global-search-input")) {
       const searchCard = document.createElement("div");
@@ -134,7 +139,7 @@
       document.getElementById("w-global-search-input").addEventListener("input", ejecutarFiltroGlobal);
     }
 
-    // Inyectar Ficha Técnica automática de coincidencia en Despacho
+    // Inyectar Ficha Técnica
     const inputCliente = document.getElementById("cli");
     if (inputCliente && !document.getElementById("w-ficha-dinamica-box")) {
       const fichaBox = document.createElement("div");
@@ -148,7 +153,7 @@
       });
     }
 
-    // Inyectar el campo Ticket Link
+    // Inyectar campo Ticket Link
     const txtProblema = document.getElementById("prob");
     if (txtProblema && !document.getElementById("w-ticket-url-input")) {
       const ticketWrapper = document.createElement("div");
@@ -197,12 +202,3 @@
     if (!wrapper) return;
     let html = `<div style="overflow-x:auto; margin-top:12px;"><table style="width:100%; border-collapse:collapse; font-size:12px; text-align:left;"><thead><tr style="background:var(--bg); border-bottom:1px solid var(--bd);"><th style="padding:8px;">ID Cliente</th><th style="padding:8px;">Nombre / Email</th><th style="padding:8px;">Plan / Servidor</th><th style="padding:8px;">Dirección IP</th><th style="padding:8px;">PPPoE User</th><th style="padding:8px;">PPPoE Pass</th></tr></thead><tbody>`;
     LOCAL_WISPRO_DATABASE.forEach(c => {
-      html += `<tr style="border-bottom:1px solid var(--bd);"><td style="padding:8px; font-weight:bold;">${c.wisproId}</td><td style="padding:8px;">${c.nombre}<br><small class="mut">${c.email}</small></td><td style="padding:8px;">${c.plan}<br><small class="mut">${c.servidor}</small></td><td style="padding:8px; color:var(--ac); font-weight:600;">${c.ip}</td><td style="padding:8px;"><code>${c.pppoe_user}</code></td><td style="padding:8px; color:var(--mut);">${c.pppoe_pass}</td></tr>`;
-    });
-    html += "</tbody></table></div>";
-    wrapper.innerHTML = html;
-  }
-
-  vincularAcciones();
-  setInterval(vincularAcciones, 1000);
-})();
