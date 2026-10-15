@@ -2,10 +2,7 @@ name: Deploy to Firebase Functions on Push
 on:
   push:
     branches:
-      - main # Cambiá por 'master' si tu rama principal se llama así
-    paths:
-      - 'functions/**' # Solo se activa si modificás algo dentro de la carpeta del backend
-
+      - main
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
@@ -16,12 +13,12 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18 # La versión nativa que requiere Firebase v2
+          node-version: 18
 
       - name: Install Dependencies
         run: |
           cd functions
-          npm ci || npm install
+          npm install
 
       - name: Deploy to Firebase
         uses: w9jds/firebase-action@master
