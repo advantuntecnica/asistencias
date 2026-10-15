@@ -1,4 +1,4 @@
-// wispro-bridge.js - Versión Final Blindada contra campos vacíos (Firestore)
+// wispro-bridge.js - Inyección dinámica aislada conectada a Firestore (Costo \$0)
 (function() {
   let LOCAL_WISPRO_DATABASE = [];
 
@@ -12,9 +12,7 @@
   };
 
   function obtenerFirestoreAislado() {
-    if (typeof firebase === "undefined") {
-      throw new Error("Las librerías de Firebase no están cargadas en la página web.");
-    }
+    if (typeof firebase === "undefined") return null;
     let appBridge = firebase.apps.find(app => app.name === "wisproBridgeApp");
     if (!appBridge) {
       appBridge = firebase.initializeApp(firebaseConfigBridge, "wisproBridgeApp");
@@ -22,38 +20,45 @@
     return appBridge.firestore();
   }
 
-  function vincularAcciones() {
-    // Escuchamos el nuevo botón modificado en tu HTML grande
-    const nuevoBoton = document.getElementById("btn-sincro-nuevo");
-    if (!nuevoBoton || nuevoBoton.dataset.vinculado) return;
+  function inicializarInyeccionesMecanicas() {
+    // 1. Buscamos tu botón original de Wispro en tu HTML intacto
+    const botonOriginal = document.querySelector('[data-act="wispro"]');
+    if (!botonOriginal || botonOriginal.dataset.puenteListo) return;
 
-    nuevoBoton.dataset.vinculado = "true";
-    nuevoBoton.addEventListener("click", async (e) => {
+    botonOriginal.dataset.puenteListo = "true";
+
+    // Creamos una copia limpia para APAGAR por completo la llamada vieja de Netlify
+    const botonLimpio = botonOriginal.cloneNode(true);
+    botonOriginal.parentNode.replaceChild(botonLimpio, botonOriginal);
+
+    // Inyectamos nuestra etiqueta de estado exclusiva para que no la borre tu JS gigante
+    const contenedorEstado = document.createElement("p");
+    contenedorEstado.id = "w-estado-exclusivo-box";
+    contenedorEstado.style = "font-weight: bold; color: var(--ac); margin-top: 8px;";
+    botonLimpio.parentNode.appendChild(contenedorEstado);
+
+    // Escucha del click hacia Firestore
+    botonLimpio.addEventListener("click", async (e) => {
       e.preventDefault();
-      
-      const statusBox = document.getElementById("wispro-st-nuevo");
-      if (statusBox) statusBox.textContent = "⏳ Conectando de forma segura con la base de datos Firestore...";
+      contenedorEstado.textContent = "⏳ Conectando de forma segura con la base de datos Firestore...";
 
       try {
         const db = obtenerFirestoreAislado();
+        if (!db) throw new Error("Firebase no está cargado en la página.");
+
         const snapshot = await db.collection("clientes_wispro").get();
-        
         if (snapshot.empty) {
           throw new Error("La colección 'clientes_wispro' está vacía en Firestore. Cargá los clientes primero.");
         }
 
         LOCAL_WISPRO_DATABASE = [];
-        snapshot.forEach(doc => {
-          LOCAL_WISPRO_DATABASE.push(doc.data());
-        });
+        snapshot.forEach(doc => { LOCAL_WISPRO_DATABASE.push(doc.data()); });
 
-        const mensajeExito = `✅ Éxito: Se cargaron ${LOCAL_WISPRO_DATABASE.length} clientes desde tu base de datos Firestore.`;
-        if (statusBox) statusBox.textContent = mensajeExito;
-        
-        // Cartel flotante obligatorio de alerta en pantalla
-        alert(mensajeExito);
+        const msgExito = `✅ Éxito: Se cargaron ${LOCAL_WISPRO_DATABASE.length} clientes desde tu base de datos Firestore.`;
+        contenedorEstado.textContent = msgExito;
+        alert(msgExito);
 
-        // Alimentar datalist original 'dl' de tu formulario
+        // Alimentar datalist original 'dl' de tu formulario base
         const dl = document.getElementById("dl");
         if (dl) {
           dl.innerHTML = "";
@@ -70,12 +75,12 @@
 
       } catch (err) {
         console.error(err);
-        if (statusBox) statusBox.textContent = `❌ Error: ${err.message}`;
+        contenedorEstado.textContent = `❌ Error: ${err.message}`;
         alert(`❌ Error al conectar: ${err.message}`);
       }
     });
 
-    // Inyectar Buscador Global Reactivo para Técnicos y Administradores
+    // 2. Inyectar Buscador Global Reactivo arriba de tu panel de "Nueva asistencia"
     const sAsist = document.getElementById("s-asist");
     if (sAsist && !document.getElementById("w-global-search-input")) {
       const searchCard = document.createElement("div");
@@ -90,13 +95,12 @@
       document.getElementById("w-global-search-input").addEventListener("input", ejecutarFiltroGlobal);
     }
 
-    // Inyectar Ficha Técnica automática al seleccionar un cliente en el input
+    // 3. Inyectar Ficha Técnica dinámica debajo del input del cliente afectado
     const inputCliente = document.getElementById("cli");
     if (inputCliente && !document.getElementById("w-ficha-dinamica-box")) {
       const fichaBox = document.createElement("div");
       fichaBox.id = "w-ficha-dinamica-box";
-      fichaBox.className = "info-wispro-box";
-      fichaBox.style.display = "none";
+      fichaBox.style = "background:var(--bg); border:1px dashed var(--bd); border-radius:8px; padding:10px; margin:8px 0; font-size:13px; line-height:1.4; display:none;";
       inputCliente.parentNode.appendChild(fichaBox);
 
       inputCliente.addEventListener("change", (e) => {
@@ -104,7 +108,7 @@
       });
     }
 
-    // Inyectar el campo Ticket Link
+    // 4. Inyectar campo Enlace de Ticket debajo del campo Problema
     const txtProblema = document.getElementById("prob");
     if (txtProblema && !document.getElementById("w-ticket-url-input")) {
       const ticketWrapper = document.createElement("div");
@@ -148,7 +152,7 @@
     if (filtrados.length === 0) { resBox.innerHTML = "<div class='mut'>No se encontraron coincidencias.</div>"; return; }
     filtrados.slice(0, 5).forEach(c => {
       const d = document.createElement("div");
-      d.style = "background:var(--bg); padding:10px; border:1px solid var(--bd); border-radius:8px; margin-bottom:6px; font-size:13px;";
+      d.style = "background:var(--card); padding:10px; border:1px solid var(--bd); border-radius:8px; margin-bottom:6px; font-size:13px;";
       d.innerHTML = `<b>👤 ${c.nombre} (ID: ${c.wisproId || "N/A"})</b><br>• Dirección: ${c.direccion || "N/A"} | Server: ${c.servidor || "N/A"}<br>• IP: ${c.ip || "N/A"} | PPPoE User: <code>${c.pppoe_user || "N/A"}</code> | Pass: <code>${c.pppoe_pass || "••••••••"}</code>`;
       resBox.appendChild(d);
     });
@@ -165,6 +169,6 @@
     wrapper.innerHTML = html;
   }
 
-  vincularAcciones();
-  setInterval(vincularAcciones, 1000);
+  // Ejecución cíclica no invasiva para asegurar el montaje tras las inyecciones asíncronas de tu JS gigante
+  setInterval(inicializarInyeccionesMecanicas, 1000);
 })();
