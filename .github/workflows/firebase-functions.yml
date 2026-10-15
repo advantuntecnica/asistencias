@@ -17,13 +17,12 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          cd asistencias/functions
+          cd functions
           npm install
 
       - name: Deploy to Firebase
         uses: w9jds/firebase-action@master
         with:
-          uses: ./asistencias
           args: deploy --only functions --project ticket-fcce5
         env:
           GCP_SA_KEY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_TICKET_FCCE5 }}
