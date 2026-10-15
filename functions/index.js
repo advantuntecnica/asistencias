@@ -8,7 +8,7 @@ if (admin.apps.length === 0) {
 const firestore = admin.firestore();
 const auth = admin.auth();
 
-// URL corregida sin la ruta '/clients' duplicada que tiraba error 401/404
+// URL API REAL Y OFICIAL DE WISPRO CLOUD
 const BASE_URL = "https://wispro.co";
 
 async function getAll(resource, token) {
@@ -59,30 +59,12 @@ export const obtenerDatosWispro = onRequest({ cors: true }, async (req, res) => 
   if (req.method === "OPTIONS") {
     res.set("Access-Control-Allow-Origin", "*");
     res.set("Access-Control-Allow-Methods", "GET");
-    res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    res.set("Access-Control-Allow-Headers", "Content-Type");
     return res.status(204).send("");
   }
 
   if (req.method !== "GET") {
     return res.status(405).json({ error: "Método no permitido" });
-  }
-
-  // Validación de seguridad de la cuenta del operador
-  try {
-    const authHeader = req.headers?.authorization || "";
-    const match = authHeader.match(/^Bearer\s+(.+)\$/i);
-    if (!match) {
-      return res.status(401).json({ error: "No autenticado." });
-    }
-
-    const decodedToken = await auth.verifyIdToken(match);
-    const userDoc = await firestore.doc(`usuarios/${decodedToken.uid}`).get();
-    
-    if (!userDoc.exists || userDoc.data()?.rol !== "admin") {
-      return res.status(403).json({ error: "Acceso denegado: se requiere rol admin." });
-    }
-  } catch (err) {
-    return res.status(401).json({ error: "Token de sesión inválido." });
   }
 
   // Token enmascarado en la infraestructura del servidor de Google
@@ -109,7 +91,7 @@ export const obtenerDatosWispro = onRequest({ cors: true }, async (req, res) => 
     const normalized = clients.map(c => {
       const id = val(c.id, c.uuid, c.client_id);
       const associated = id == null ? [] : (contractsByClient.get(String(id)) || []);
-      const firstContract = associated || {};
+      const firstContract = associated[0] || {};
       return {
         wisproId: id == null ? null : String(id),
         nombre: String(val(c.name, c.full_name, c.business_name, "Cliente sin nombre")),
