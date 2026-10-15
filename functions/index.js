@@ -125,3 +125,4 @@ export const obtenerDatosWispro = onRequest({ cors: true }, async (req, res) => 
     return res.status(502).json({ error: err?.message || "Error al conectar con Wispro." });
   }
 });
+
