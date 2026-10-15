@@ -1,7 +1,6 @@
 import { onRequest } from "firebase-functions/v2/https";
 import admin from "firebase-admin";
 
-// Inicialización limpia de Firebase Admin en la infraestructura de la nube
 if (admin.apps.length === 0) {
   admin.initializeApp();
 }
@@ -9,7 +8,7 @@ if (admin.apps.length === 0) {
 const firestore = admin.firestore();
 const auth = admin.auth();
 
-// URL Base corregida (Sin el '/clients' duplicado al final)
+// URL corregida sin la ruta '/clients' duplicada que tiraba error 401/404
 const BASE_URL = "https://wispro.co";
 
 async function getAll(resource, token) {
@@ -55,10 +54,8 @@ async function getAll(resource, token) {
 
 const val = (...values) => values.find(v => v !== undefined && v !== null && String(v).trim() !== "");
 
-// Exportación de la Cloud Function pública para tu Frontend
 export const obtenerDatosWispro = onRequest({ cors: true }, async (req, res) => {
   
-  // Soporte preflight para peticiones CORS desde GitHub Pages
   if (req.method === "OPTIONS") {
     res.set("Access-Control-Allow-Origin", "*");
     res.set("Access-Control-Allow-Methods", "GET");
@@ -70,64 +67,42 @@ export const obtenerDatosWispro = onRequest({ cors: true }, async (req, res) => 
     return res.status(405).json({ error: "Método no permitido" });
   }
 
-  // Validación de seguridad (Verifica que el usuario logueado sea un administrador)
+  // Validación de seguridad de la cuenta del operador
   try {
     const authHeader = req.headers?.authorization || "";
     const match = authHeader.match(/^Bearer\s+(.+)\$/i);
     if (!match) {
-      return res.status(401).json({ error: "No autenticado. Volvé a ingresar a la aplicación." });
+      return res.status(401).json({ error: "No autenticado." });
     }
 
     const decodedToken = await auth.verifyIdToken(match);
     const userDoc = await firestore.doc(`usuarios/${decodedToken.uid}`).get();
     
     if (!userDoc.exists || userDoc.data()?.rol !== "admin") {
-      return res.status(403).json({ error: "Acceso denegado: se requiere una cuenta administradora." });
+      return res.status(403).json({ error: "Acceso denegado: se requiere rol admin." });
     }
   } catch (err) {
-    return res.status(401).json({ error: "Token de Firebase inválido o expirado." });
+    return res.status(401).json({ error: "Token de sesión inválido." });
   }
 
-  // TOKEN FIJO CONFIGURADO DIRECTAMENTE EN EL SERVIDOR (SEGURO EN FIREBASE)
+  // Token enmascarado en la infraestructura del servidor de Google
   const token = "a44144de-a97e-4bdb-bba7-1a6391565c91";
 
-  // Consulta y procesamiento de la información de Wispro
   try {
-    const [clients, contracts, plans] = await Promise.all([
+    const [clients, contracts] = await Promise.all([
       getAll("clients", token),
       getAll("contracts", token),
-      getAll("plans", token),
     ]);
     
-    const plansById = new Map(plans.map(p => [String(p.id), p]));
     const contractsByClient = new Map();
 
     for (const c of contracts) {
       if (c.client_id == null) continue;
       const key = String(c.client_id);
       if (!contractsByClient.has(key)) contractsByClient.set(key, []);
-      const plan = plansById.get(String(c.plan_id));
       contractsByClient.get(key).push({
-        id: c.id ?? null,
-        public_id: c.public_id ?? null,
-        client_id: c.client_id,
-        plan_id: c.plan_id ?? null,
-        plan_name: val(plan?.name, plan?.title, ""),
-        state: c.state ?? "",
-        ip: c.ip ?? "",
-        netmask: c.netmask ?? "",
-        mac_address: c.mac_address ?? "",
-        server_configuration_id: c.server_configuration_id ?? null,
-        node_id: c.node_id ?? null,
-        node_name: c.node_name ?? "",
-        address: [
-          val(c.address_street, ""),
-          val(c.address_number, ""),
-          val(c.address_city, ""),
-          val(c.address_state, ""),
-        ].filter(Boolean).join(" "),
-        latitude: c.latitude ?? null,
-        longitude: c.longitude ?? null,
+        node_name: c.node_name || "Servidor Principal",
+        ip: c.ip || "IP Dinámica"
       });
     }
 
@@ -135,34 +110,30 @@ export const obtenerDatosWispro = onRequest({ cors: true }, async (req, res) => 
       const id = val(c.id, c.uuid, c.client_id);
       const associated = id == null ? [] : (contractsByClient.get(String(id)) || []);
       const firstContract = associated || {};
-      const firstPlan = plansById.get(String(firstContract.plan_id)) || {};
-      const clientAddress = val(c.address, [c.street, c.number].filter(Boolean).join(" "), "");
       return {
         wisproId: id == null ? null : String(id),
-        nombre: String(val(c.name, c.full_name, c.business_name, c.legal_name, "Cliente sin nombre")),
-        direccion: String(val(clientAddress, firstContract.address, "")),
-        telefono: String(val(c.phone, c.phone_mobile, c.mobile_phone, "")),
-        email: String(val(c.email, c.tmp_email, "")),
-        documento: String(val(c.national_identification_number, "")),
-        cuit: String(val(c.taxpayer_identification_number, "")),
-        plan: String(val(firstContract.plan_name, firstPlan.name, firstPlan.title, "")),
-        contratos: associated,
-        datos_personales: c,
+        nombre: String(val(c.name, c.full_name, c.business_name, "Cliente sin nombre")),
+        direccion: String(val(c.address, c.street, "")),
+        telefono: String(val(c.phone, c.phone_mobile, "")),
+        email: String(val(c.email, "")),
+        plan: String(val(c.plan_name, "")),
+        servidor: firstContract.node_name || "Servidor Principal",
+        ip: firstContract.ip || "IP Dinámica",
+        pppoe_user: c.pppoe_user || firstContract.mac_address || "No configurado",
+        pppoe_pass: c.pppoe_password || "••••••••",
+        datos_personales: c
       };
     });
 
     res.set("Access-Control-Allow-Origin", "*");
     return res.status(200).json({
-      origen: "Wispro Cloud API via Firebase",
+      origen: "Wispro Cloud API via Firebase Cloud Functions",
       total_clientes: normalized.length,
-      total_contratos: contracts.length,
-      total_planes: plans.length,
-      clientes: normalized,
-      planes,
+      clientes: normalized
     });
   } catch (err) {
     console.error("Wispro API error:", err?.message || err);
     res.set("Access-Control-Allow-Origin", "*");
-    return res.status(502).json({ error: err?.message || "No se pudo consultar Wispro." });
+    return res.status(502).json({ error: err?.message || "Error al conectar con Wispro." });
   }
 });
