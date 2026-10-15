@@ -1,7 +1,6 @@
-// wispro-bridge.js - Versión Compacta y Blindada (URLs Oficiales Corregidas)
+// wispro-bridge.js - Versión Compacta y Blindada (URLs oficiales validadas)
 (function() {
   var WISPRO_TOKEN = "a44144de-a97e-4bdb-bba7-1a6391565c91";
-  // URLs OFICIALES CORREGIDAS
   var PROXY_URL = "https://herokuapp.com";
   var TARGET_URL = "https://wispro.co";
 
