@@ -57,7 +57,6 @@ em{font-size:10px;color:var(--mut)}
 .grid3 label{display:block;font-size:12px;color:var(--mut)}
 .b-Sin{background:#9b4dca}.e-Sin{color:#9b4dca;border-color:#9b4dca}
 #toast{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--tx);color:var(--bg);padding:10px 14px;border-radius:10px;display:none;z-index:9;max-width:90%}
-.info-wispro-box{background:var(--bg);border:1px dashed var(--bd);border-radius:8px;padding:10px;margin:8px 0;font-size:13px;line-height:1.4}
 </style></head>
 <body>
 <header><div class="row" style="justify-content:space-between;padding-right:10px"><h1>🛠️ Asistencias técnicas</h1><button id="out" hidden>Salir</button></div>
@@ -100,12 +99,8 @@ em{font-size:10px;color:var(--mut)}
  </div>
  <div class="card"><b>Importar desde Wispro Cloud</b>
   <p class="mut">Consulta clientes, contratos y planes de Wispro. Los clientes importados se guardan en esta aplicación con un identificador propio de Wispro para poder sincronizarlos nuevamente.</p>
-  <!-- BOTÓN MODIFICADO AQUÍ ABAJO CON ID EXCLUSIVO PARA FIREBASE Y PERFIL REUTILIZABLE -->
-  <div class="row">
-    <button class="pri" id="btn-sincro-nuevo">🔄 Importar / sincronizar desde Wispro</button>
-    <button data-act="wispro-json">Descargar JSON</button>
-  </div>
-  <p id="wispro-st-nuevo" class="mut" style="font-weight: bold; color: var(--ac); margin-top: 8px;"></p>
+  <div class="row"><button class="pri" data-act="wispro">🔄 Importar / sincronizar desde Wispro</button><button data-act="wispro-json">Descargar JSON</button></div>
+  <p id="wispro-st" class="mut" aria-live="polite"></p>
  </div>
  <div class="card"><b>Importar desde CSV</b>
   <p class="mut">Archivo .csv con encabezado: nombre, direccion, telefono, plan (separado por coma o punto y coma; en Excel: Guardar como → CSV). Los clientes que ya existen (mismo nombre y dirección) se omiten. Máximo 500 filas por carga.</p>
@@ -121,7 +116,7 @@ em{font-size:10px;color:var(--mut)}
 </section>
 </main>
 
-<!-- CONEXIÓN EXCLUSIVA HACIA EL NUEVO PUENTE COMPACTO DE FIRESTORE -->
+<!-- CONEXIÓN COMPLETAMENTE INOCUA Y EXTERNA PARA EL NUEVO PUENTE -->
 <script src="wispro-bridge.js"></script>
 </body>
 </html>
