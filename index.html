@@ -40,10 +40,29 @@
     .chk label{display:flex;gap:6px;align-items:center;border:1px solid var(--bd);border-radius:99px;padding:5px 10px}
     .chk input{width:auto}
     p{margin:6px 0}a{color:var(--ac)}
+    .cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+    .dh{text-align:center;font-size:12px;color:var(--mut)}
+    .day{min-height:64px;border:1px solid var(--bd);border-radius:8px;padding:3px;background:var(--card);cursor:pointer;overflow:hidden;font-size:12px}
+    .day.sel{outline:2px solid var(--ac)}.day.today span{color:var(--ac);font-weight:700}
+    .bar{display:block;font-style:normal;font-size:10px;line-height:1.3;padding:1px 3px;border-radius:4px;margin-top:2px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .b-Pendiente{background:var(--wa)}.b-Encurso{background:var(--ac)}.b-Resuelta{background:var(--ok)}
+    .dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-left:8px;vertical-align:middle}
+    em{font-size:10px;color:var(--mut)}
+    .filebtn{cursor:pointer;border:1px solid var(--bd);border-radius:8px;padding:8px 10px;background:var(--card)}
+    .ph{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+    .th{width:96px;height:96px;object-fit:cover;border-radius:8px;cursor:zoom-in}
+    .th.big{width:100%;height:auto;max-height:70vh;object-fit:contain}
+    #login{position:fixed;inset:0;background:var(--bg);z-index:20;display:flex;align-items:center;justify-content:center;padding:16px}
+    #login[hidden]{display:none}
+    #login .card{width:100%;max-width:360px}
+    .sig{display:block;width:100%;height:150px;background:#fff;border:1px solid var(--bd);border-radius:8px;touch-action:none;margin:6px 0}
+    #done{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:15;display:flex;align-items:center;justify-content:center;padding:16px}
+    #done[hidden]{display:none}
+    #done .card{width:100%;max-width:380px}
     .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
     .grid3 label{display:block;font-size:12px;color:var(--mut)}
-    #wispro-st{font-weight:600;padding:6px 0}
-    .info-wispro-box{background:var(--bg);border:1px dashed var(--bd);border-radius:8px;padding:8px;margin-top:8px;font-size:13px}
+    .b-Sin{background:#9b4dca}.e-Sin{color:#9b4dca;border-color:#9b4dca}
+    #toast{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--tx);color:var(--bg);padding:10px 14px;border-radius:10px;display:none;z-index:9;max-width:90%}
   </style>
 </head>
 <body>
@@ -52,135 +71,87 @@
     <h1>🛠️ Asistencias técnicas</h1>
     <button id="out" hidden>Salir</button>
   </div>
-  <nav id="tabs">
-    <button class="on" onclick="switchSection('s-asist')">Asistencias / Despacho</button>
-    <button onclick="switchSection('s-cli')">Clientes Wispro</button>
-    <button onclick="switchSection('s-historial')">Historial de Tareas</button>
-  </nav>
+  <nav id="tabs"></nav>
 </header>
 <main>
   <p id="msg" class="mut" hidden></p>
 
-  <!-- SECCIÓN 1: ASISTENCIAS Y DESPACHO -->
-  <section id="s-asist">
-    <!-- PANEL GLOBAL DE BÚSQUEDA (Para Técnicos y Admins) -->
-    <div class="card">
-      <b>🔍 Buscador Global de Clientes Afectados</b>
-      <p class="mut">Buscá un cliente para consultar de forma inmediata su estado y credenciales de red en Wispro.</p>
-      <input type="text" id="buscador-global" placeholder="Escribí nombre, ID de cliente, email o dirección IP..." oninput="filtrarBuscadorGlobal()">
-      <div id="resultado-buscador-global"></div>
-    </div>
+  <section id="s-cal" hidden></section>
 
+  <section id="s-asist">
     <div class="card">
-      <b>Nueva asistencia / Despacho</b>
+      <b>Nueva asistencia</b>
       <div class="grid" style="margin-top:8px">
-        <div>
-          <input id="cli" list="dl" placeholder="Buscar cliente afectado…" autocomplete="off" onchange="completarCamposDesdeWispro(this.value)">
-          <datalist id="dl"></datalist>
-        </div>
+        <div><input id="cli" list="dl" placeholder="Buscar cliente afectado…" autocomplete="off"><datalist id="dl"></datalist></div>
         <select id="pri"><option>Media</option><option>Alta</option><option>Baja</option></select>
       </div>
-      
-      <!-- CUADRO DE DATOS DINÁMICOS DE WISPRO -->
-      <div id="detalles-wispro-automatico" class="info-wispro-box" style="display:none;"></div>
-
       <textarea id="prob" rows="2" placeholder="Problema (ej: sin internet, LOS rojo en ONU)" style="margin:8px 0"></textarea>
-      
-      <!-- NUEVO CAMPO SOLICITADO: TICKET LINK -->
-      <div style="margin:8px 0">
-        <label style="font-size:12px;color:var(--mut);font-weight:600;">🔗 Enlace de Ticket Externo:</label>
-        <input type="url" id="ticket-link" placeholder="Pegá acá el link del ticket (ej: https://crm.com)">
-      </div>
-
       <div class="row" style="margin-bottom:8px"><label class="filebtn">🖼 Adjuntar imágenes<input type="file" id="desp-file" accept="image/*" multiple hidden></label><span class="mut" id="desp-n"></span></div>
       <div class="row" style="margin-bottom:6px"><button type="button" data-act="mipos">📍 Usar mi ubicación actual</button><input id="ubic" placeholder="o pegá coordenadas / enlace de Google Maps"></div>
+      <div class="mut" id="ubic-st" style="margin-bottom:8px"></div>
       <div class="grid3" style="margin-bottom:8px"><label>Fecha<input type="date" id="fec"></label><label>Desde<input type="time" id="hor"></label><label>Hasta<input type="time" id="hor2"></label></div>
-      
-      <p><button class="pri" onclick="crearNuevaTareaDespacho()">Crear y asignar despacho</button></p>
+      <div class="mut" style="margin-bottom:4px">Asignar a (opcional: se puede hacer después tocando la carga en el calendario):</div>
+      <div class="chk" id="tchk"></div>
+      <p><button class="pri" data-act="crear">Crear y asignar</button></p>
     </div>
-    <div id="lista-asistencias"></div>
+    <div class="row" id="filtros"></div>
+    <div id="lista"></div>
   </section>
 
-  <!-- SECCIÓN 2: CONTROL Y CONTROL DE CLIENTES WISPRO -->
   <section id="s-cli" hidden>
-    <div class="card"><b>Importar desde Wispro Cloud</b>
-      <p class="mut">Consulta clientes, contratos y planes de Wispro. Trae de forma directa: Nombre, Email, Dirección, ID Cliente, Servidor, Plan, Dirección IP, PPPoE Username y PPPoE Password.</p>
-      <div class="row">
-        <button class="pri" onclick="consultarWisproEnFirebase()">🔄 Importar / sincronizar desde Wispro</button>
+    <div class="card"><b>Nuevo cliente</b>
+      <div class="grid" style="margin-top:8px">
+        <input id="c-nom" placeholder="Nombre / Razón social">
+        <input id="c-dir" placeholder="Dirección">
+        <input id="c-tel" placeholder="Teléfono" inputmode="tel">
+        <input id="c-plan" placeholder="Plan (ej: 100 Mb)">
+        <input id="c-email" type="email" placeholder="Email del cliente (opcional)">
       </div>
+      <p><button class="pri" data-act="addcli">Guardar cliente</button></p>
+    </div>
+    <div class="card"><b>Importar desde Wispro Cloud</b>
+      <p class="mut">Consulta clientes, contratos y planes de Wispro. Los clientes importados se guardan en esta aplicación con un identificador propio de Wispro para poder sincronizarlos nuevamente.</p>
+      <div class="row"><button class="pri" data-act="wispro">🔄 Importar / sincronizar desde Wispro</button><button data-act="wispro-json">Descargar JSON</button></div>
       <p id="wispro-st" class="mut" aria-live="polite"></p>
     </div>
-    
-    <input id="c-q" placeholder="Filtrar base de datos de clientes…" oninput="renderizarTablaClientes()">
-    <div id="l-cli" style="overflow-x:auto; margin-top:12px;"></div>
+    <div class="card"><b>Importar desde CSV</b>
+      <p class="mut">Archivo .csv con encabezado: nombre, direccion, telefono, plan (separado por coma o punto y coma; en Excel: Guardar como → CSV). Los clientes que ya existen (mismo nombre y dirección) se omiten. Máximo 500 filas por carga.</p>
+      <input type="file" id="csv" accept=".csv,.txt,text/csv">
+      <p id="csv-st" class="mut"></p>
+    </div>
+    <input id="c-q" placeholder="Filtrar clientes…">
+    <div id="l-cli"></div>
   </section>
 
-  <!-- NUEVA SECCIÓN SOLICITADA: VER TAREAS REALIZADAS -->
-  <section id="s-historial" hidden>
-    <div class="card">
-      <b>📋 Historial General de Tareas Realizadas</b>
-      <p class="mut">Espacio de consulta para técnicos y administradores sobre asistencias finalizadas o en curso.</p>
-      <input type="text" id="filtro-historial" placeholder="Filtrar por técnico, cliente o estado..." oninput="renderizarHistorial()">
-      <div id="lista-historial" style="margin-top:12px;"></div>
-    </div>
+  <section id="s-tec" hidden>
+    <div class="card"><b>Nuevo técnico</b></div>
   </section>
 </main>
 
-<script src="https://gstatic.com"></script>
-<script src="https://gstatic.com"></script>
-<script src="https://gstatic.com"></script>
-
 <script>
-  // Configuración de tu base de datos Firebase entregada
-  const firebaseConfig = {
-    apiKey: "AIzaSyBz8UMEOOZ9n6unW-n_xXlnBv1XqdWVDfU",
-    authDomain: "://firebaseapp.com",
-    projectId: "ticket-fcce5",
-    storageBucket: "ticket-fcce5.firebasestorage.app",
-    messagingSenderId: "597575091640",
-    appId: "1:597575091640:web:3f5861be323276bc05bb4d"
-  };
-  
-  if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-  }
+  // URL DE TU NUEVA FIREBASE CLOUD FUNCTION (Reemplaza con tu URL real cuando hagas el deploy)
+  const FIREBASE_FUNCTION_URL = "https://obtenerdatoswispro-<tu-proyecto-id>.<region>.cloudfunctions.net/obtenerDatosWispro";
 
-  // URL DIRECTA DE TU CLOUD FUNCTION QUE CONTIENE EL TOKEN SEGURO
-  const FIREBASE_FUNCTION_URL = "https://run.app";
-
-  // Memoria caché local para el buscador fluido sin recargar la página
-  let BD_CLIENTES_WISPRO = [];
-  let TAREAS_LOCALES = [
-    { cliente: "Juan Pérez", problema: "LOS Rojo en ONU", estado: "Resuelta", fecha: "2026-10-14", ticket: "https://crm.com", tecnico: "Carlos Tech" },
-    { cliente: "Empresa Conectar", problema: "Cambio de router por falla de WiFi", estado: "En curso", fecha: "2026-10-15", ticket: "", tecnico: "Lucas Redes" }
-  ];
-
-  function switchSection(sectionId) {
-    document.querySelectorAll("main > section").forEach(s => s.hidden = true);
-    document.getElementById(sectionId).hidden = false;
-    document.querySelectorAll("nav button").forEach(b => b.classList.remove("on"));
-    event.target.classList.add("on");
-    if(sectionId === 's-historial') renderizarHistorial();
-  }
-
-  // Sincronización masiva desde Firebase Cloud Functions
+  // Función encargada de conectarse a la API de forma segura usando el token de Firebase Auth
   async function consultarWisproEnFirebase() {
     const statusEl = document.getElementById("wispro-st");
     if (!statusEl) return;
-    statusEl.textContent = "⏳ Conectando de forma segura con Firebase Cloud Functions...";
+
+    statusEl.textContent = "⏳ Conectando con Firebase y consultando Wispro Cloud...";
 
     try {
-      if (!firebase.auth().currentUser) {
-        throw new Error("Sesión inactiva. Validá tus credenciales en el login.");
+      // 1. Conseguir el usuario activo en el frontend desde Firebase Auth
+      // Nota: Asumo que usas la SDK global de Firebase o una variable "auth" ya instanciada
+      if (typeof firebase === "undefined" || !firebase.auth().currentUser) {
+        throw new Error("No has iniciado sesión en la aplicación o Firebase no está cargado.");
       }
+      
+      // 2. Extraer el IdToken dinámico (Bearer) del usuario para verificar sus permisos de Admin en el backend
       const idToken = await firebase.auth().currentUser.getIdToken(true);
 
+      // 3. Petición limpia a tu Cloud Function
       const respuesta = await fetch(FIREBASE_FUNCTION_URL, {
         method: "GET",
         headers: {
           "Authorization": `Bearer ${idToken}`,
           "Accept": "application/json"
-        }
-      });
-
-      const datos = await respuesta.json();
