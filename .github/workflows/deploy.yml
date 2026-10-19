@@ -23,7 +23,7 @@ jobs:
       - name: Deploy to Firebase
         uses: w9jds/firebase-action@master
         with:
-          # SOLUCCIÓN: Eliminamos el comando de secretos que causaba el error 403
-          args: firebase deploy --only functions --project ticket-fcce5
+          # SOLUCCIÓN DEFINITIVA: Se quitó la palabra 'firebase' para evitar el comando duplicado en el contenedor
+          args: deploy --only functions --project ticket-fcce5
         env:
           GCP_SA_KEY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_TICKET_FCCE5 }}
