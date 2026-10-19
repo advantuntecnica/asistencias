@@ -210,12 +210,17 @@
   </div>
 
   <!-- INTEGRACIÓN CON FIREBASE Y LÓGICA DE CONTROL -->
+    <!-- INTEGRACIÓN CON FIREBASE CORREGIDA Y UNIFICADA -->
   <script type="module">
+    // Importamos las librerías oficiales compatibles para la web
     import { initializeApp } from "https://gstatic.com";
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://gstatic.com";
     import { getFirestore, doc, getDoc, collection, addDoc, query, getDocs } from "https://gstatic.com";
+    
+    // Importación segura de tus llaves de Firebase
     import { firebaseConfig } from "./firebase-config.js";
 
+    // Inicializamos Firebase
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
@@ -223,31 +228,43 @@
     let usuarioActual = null;
     let datosWisproCache = [];
 
-    // URL de tu función en Firebase Cloud Functions v2
-    const FUNCION_WISPRO_URL = `https://run.app`; // Ajustar si cambia tu ruta de deploy
+    // URL de tu función en Firebase (Corregida con tu ID de proyecto real: ticket-fcce5)
+    const FUNCION_WISPRO_URL = "https://run.app";
 
-    // Control de pantallas según estado de autenticación
+    // 1. CONTROL DE PANTALLAS Y LOGEO
     onAuthStateChanged(auth, async (user) => {
       if (user) {
-        const userDoc = await getDoc(doc(db, "usuarios", user.uid));
-        if (userDoc.exists()) {
-          usuarioActual = { uid: user.uid, ...userDoc.data() };
+        try {
+          // Buscamos el rol del usuario en la colección "usuarios" usando su UID de autenticación
+          const userDoc = await getDoc(doc(db, "usuarios", user.uid));
           
-          document.getElementById("login-screen").classList.add("hidden");
-          document.getElementById("main-screen").classList.remove("hidden");
-          
-          // Mostrar utilidades de Administrador solo si tiene rol admin
-          if (usuarioActual.rol === 'admin') {
-            document.getElementById("admin-actions").classList.remove("hidden");
+          if (userDoc.exists()) {
+            usuarioActual = { uid: user.uid, ...userDoc.data() };
+            
+            // Ocultamos pantalla de login y mostramos el panel principal
+            document.getElementById("login-screen").classList.add("hidden");
+            document.getElementById("main-screen").classList.remove("hidden");
+            
+            // Si es administrador, le mostramos el panel de Wispro y herramientas extra
+            if (usuarioActual.rol === 'admin') {
+              document.getElementById("admin-actions").classList.remove("hidden");
+            } else {
+              document.getElementById("admin-actions").classList.add("hidden");
+            }
+            
+            // Cargamos los datos de la interfaz
+            cargarHistorialTareas();
+            cargarListaTecnicos();
+          } else {
+            alert("Acceso denegado: Tu usuario autenticado no figura registrado en la colección de 'usuarios' de la Base de Datos.");
+            await signOut(auth);
           }
-          
-          cargarHistorialTareas();
-          cargarListaTecnicos();
-        } else {
-          alert("Tu usuario no está registrado en la base de datos.");
-          signOut(auth);
+        } catch (err) {
+          alert("Error al verificar los permisos de tu usuario: " + err.message);
+          await signOut(auth);
         }
       } else {
+        // Si no está logeado, mostramos solo la pantalla de login
         document.getElementById("login-screen").classList.remove("hidden");
         document.getElementById("main-screen").classList.add("hidden");
         document.getElementById("admin-actions").classList.add("hidden");
@@ -255,16 +272,183 @@
       }
     });
 
-    // Login
-    document.getElementById("btn-login").addEventListener("click", async () => {
-      const email = document.getElementById("login-email").value;
+    // Evento del botón de Ingresar
+    document.getElementById("btn-login").addEventListener("click", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("login-email").value.trim();
       const pass = document.getElementById("login-pass").value;
+
+      if (!email || !pass) {
+        alert("Por favor, completa ambos campos.");
+        return;
+      }
+
       try {
         await signInWithEmailAndPassword(auth, email, pass);
       } catch (err) {
-        alert("Error al iniciar sesión: " + err.message);
+        console.error("Error Login:", err);
+        alert("Usuario o contraseña incorrectos. Verifica los datos.");
       }
     });
+
+    // Evento del botón Salir
+    document.getElementById("btn-logout").addEventListener("click", () => signOut(auth));
+
+    // 2. BUSCADOR INTERACTIVO DIRECTO DESDE FIRESTORE (Para Admins y Técnicos)
+    document.getElementById("search-input").addEventListener("input", async (e) => {
+      const term = e.target.value.toLowerCase().trim();
+      const container = document.getElementById("search-results");
+      container.innerHTML = "";
+
+      if (term.length < 2) return;
+
+      try {
+        // Buscamos de forma directa en tu colección 'clientes' de Firestore
+        const querySnapshot = await getDocs(query(collection(db, "clientes")));
+        let clientes = [];
+        querySnapshot.forEach((doc) => {
+          clientes.push({ id_db: doc.id, ...doc.data() });
+        });
+
+        const filtered = clientes.filter(c => 
+          (c.nombre && c.nombre.toLowerCase().includes(term)) ||
+          (c.wisproId && String(c.wisproId).includes(term)) ||
+          (c.direccion && c.direccion.toLowerCase().includes(term))
+        );
+
+        if (filtered.length === 0) {
+          container.innerHTML = `<p style="color: var(--text-muted); font-size: 14px;">No se encontraron clientes.</p>`;
+          return;
+        }
+
+        filtered.forEach(c => {
+          const div = document.createElement("div");
+          div.style.padding = "10px";
+          div.style.borderBottom = "1px solid var(--border)";
+          div.style.cursor = "pointer";
+          div.style.backgroundColor = "var(--bg-primary)";
+          div.innerHTML = `
+            <strong>${c.nombre}</strong> <span style="font-size:12px; color:var(--accent);">ID: ${c.wisproId || 'Sin ID'}</span><br>
+            <small style="color: var(--text-muted);">${c.direccion || 'Sin Dirección'} | IP: ${c.ip || 'Dinamica'} | Plan: ${c.plan || 'Sin Plan'}</small>
+          `;
+          
+          div.addEventListener("click", () => {
+            document.getElementById("asistencia-cliente").value = c.nombre;
+            document.getElementById("asistencia-dir").value = c.direccion || "";
+            document.getElementById("asistencia-plan").value = c.plan || "";
+            container.innerHTML = "";
+            document.getElementById("search-input").value = "";
+          });
+          container.appendChild(div);
+        });
+      } catch (err) {
+        console.error("Error en buscador:", err);
+      }
+    });
+
+    // 3. SINCRONIZACIÓN Y DESCARGA (Solo Admins)
+    document.getElementById("btn-sync-wispro").addEventListener("click", async () => {
+      const btn = document.getElementById("btn-sync-wispro");
+      btn.innerText = "🔄 Sincronizando... por favor espere";
+      btn.disabled = true;
+
+      try {
+        const token = await auth.currentUser.getIdToken();
+        const res = await fetch(FUNCION_WISPRO_URL, {
+          method: "GET",
+          headers: { "Authorization": `Bearer ${token}` }
+        });
+        
+        if (!res.ok) throw new Error("Error en la respuesta del servidor de funciones.");
+        const data = await res.json();
+        
+        datosWisproCache = data.clientes || [];
+        alert(`¡Sincronización exitosa! Se procesaron ${data.total_clientes || 0} clientes de Wispro.`);
+      } catch (err) {
+        alert("No se pudo conectar con la función de Wispro: " + err.message);
+      } finally {
+        btn.innerText = "🔄 Importar / sincronizar desde Wispro";
+        btn.disabled = false;
+      }
+    });
+
+    // Descarga estructurada en CSV/Excel
+    document.getElementById("btn-download-json").addEventListener("click", () => {
+      if (!datosWisproCache || datosWisproCache.length === 0) {
+        alert("Primero debes realizar la sincronización con Wispro para descargar los datos.");
+        return;
+      }
+
+      const headers = ["Nombre", "Email", "Direccion", "ID Cliente", "Servidor", "Plan", "Direccion IP", "PPPoE Username", "PPPoE Password"];
+      const csvRows = [headers.join(",")];
+
+      for (const c of datosWisproCache) {
+        const row = [
+          `"${(c.nombre || '').replace(/"/g, '""')}"`,
+          `"${(c.email || '').replace(/"/g, '""')}"`,
+          `"${(c.direccion || '').replace(/"/g, '""')}"`,
+          `"${c.wisproId || ''}"`,
+          `"${c.servidor || ''}"`,
+          `"${c.plan || ''}"`,
+          `"${c.ip || ''}"`,
+          `"${c.pppoe_user || ''}"`,
+          `"${c.pppoe_pass || ''}"`
+        ];
+        csvRows.push(row.join(","));
+      }
+
+      const csvContent = "\uFEFF" + csvRows.join("\n");
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", `Base_Wispro.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    });
+
+    // 4. CREACIÓN DE ASISTENCIAS (Despacho)
+    document.getElementById("form-asistencia").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      
+      const nuevaAsistencia = {
+        cliente: document.getElementById("asistencia-cliente").value,
+        telefono: document.getElementById("asistencia-tel").value,
+        direccion: document.getElementById("asistencia-dir").value,
+        plan: document.getElementById("asistencia-plan").value,
+        ticket_link: document.getElementById("asistencia-ticket-link").value, // Guardamos el link del ticket
+        prioridad: document.getElementById("asistencia-prioridad").value,
+        tecnicoId: document.getElementById("asistencia-tecnico").value,
+        creadoPor: usuarioActual.uid,
+        fecha: new Date().toISOString(),
+        estado: "pendiente"
+      };
+
+      try {
+        await addDoc(collection(db, "asistencias"), nuevaAsistencia);
+        alert("¡Asistencia despachada con éxito!");
+        document.getElementById("form-asistencia").reset();
+        cargarHistorialTareas();
+      } catch (err) {
+        alert("Error al guardar la asistencia: " + err.message);
+      }
+    });
+
+    // Cargar historial de la base de datos
+    async function cargarHistorialTareas() {
+      try {
+        const q = query(collection(db, "asistencias"));
+        const snap = await getDocs(q);
+        const container = document.getElementById("tasks-list");
+        container.innerHTML = "";
+
+        if (snap.empty) {
+          container.innerHTML = `<p style="color: var(--text-muted);">No hay asistencias registradas en el sistema.</p>`;
+          return;
+        }
+
+
 
     // Logout
     document.getElementById("btn-logout").addEventListener("click", () => signOut(auth));
