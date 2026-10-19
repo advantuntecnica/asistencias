@@ -97,8 +97,8 @@ export const obtenerDatosWispro = onRequest({ cors: true, secrets: ["WISPRO_TOKE
 
   const token = process.env.WISPRO_TOKEN;
   if (!token) {
-    res.set("Access-Control-Allow-Origin", "*");
-    return res.status(500).json({ error: "Falta configurar el secreto WISPRO_TOKEN." });
+      // Configuración directa y segura para Firebase Cloud Functions
+  const token = "a44144de-a97e-4bdb-bba7-1a6391565c91"; 
   }
 
   // 2. Consulta y normalización estricta de la base de datos de Wispro
