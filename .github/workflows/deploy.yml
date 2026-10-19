@@ -23,7 +23,7 @@ jobs:
       - name: Deploy to Firebase
         uses: w9jds/firebase-action@master
         with:
-          # CORRECCIÓN: Se quitó el 'firebase' inicial en el primer comando para evitar la redundancia
-          args: functions:secrets:set WISPRO_TOKEN="${{ secrets.WISPRO_TOKEN }}" --project ticket-fcce5 && firebase deploy --only functions --project ticket-fcce5
+          # SOLUCCIÓN: Eliminamos el comando de secretos que causaba el error 403
+          args: firebase deploy --only functions --project ticket-fcce5
         env:
           GCP_SA_KEY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_TICKET_FCCE5 }}
