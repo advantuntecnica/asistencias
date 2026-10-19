@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Asistencias Técnicas</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <style>
+    :root {
+      --bg-primary: #14171b;
+      --bg-surface: #1d2127;
+      --accent: #1d6fe0;
+      --text-main: #ffffff;
+      --text-muted: #a0a5b0;
+      --border: #2d323b;
+    }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-main);
+    }
+    header {
+      background-color: var(--bg-surface);
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+    }
+    .btn {
+      background-color: var(--accent);
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .btn-secondary {
+      background-color: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-main);
+    }
+    .container {
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 0 15px;
+    }
+    .card {
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 10px;
+      background-color: var(--bg-primary);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: white;
+      box-sizing: border-box;
+    }
+    .hidden { display: none !important; }
+    .badge {
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+    .badge-alta { background-color: #e53e3e; }
+    .badge-media { background-color: #dd6b20; }
+    .badge-baja { background-color: #3182ce; }
+  </style>
+</head>
+<body>
+
+  <!-- SECCIÓN DE LOGIN -->
+  <div id="login-screen" class="container" style="margin-top: 100px; max-width: 400px;">
+    <div class="card" style="text-align: center;">
+      <h2>🛠 Asistencias técnicas</h2>
+      <p style="color: var(--text-muted);">Ingresá con tu cuenta para continuar.</p>
+      <div class="form-group" style="text-align: left;">
+        <label>Correo Electrónico</label>
+        <input type="email" id="login-email" placeholder="ejemplo@correo.com">
+      </div>
+      <div class="form-group" style="text-align: left;">
+        <label>Contraseña</label>
+        <input type="password" id="login-pass" placeholder="••••••••">
+      </div>
+      <button class="btn" id="btn-login" style="width: 100%;">Ingresar</button>
+    </div>
+  </div>
+
+  <!-- PANEL PRINCIPAL (ADMINISTRADORES Y TÉCNICOS) -->
+  <div id="main-screen" class="hidden">
+    <header>
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <span style="font-size: 20px;">🛠</span>
+        <strong>Asistencias Técnicas</strong>
+      </div>
+      <button class="btn btn-secondary" id="btn-logout">Salir</button>
+    </header>
+
+    <div class="container">
+      
+      <!-- BUSCADOR GLOBAL DE CLIENTES Y TAREAS REALIZADAS (Para Admins y Técnicos) -->
+      <div class="card">
+        <h3>🔍 Buscador Global de Clientes</h3>
+        <div class="form-group">
+          <input type="text" id="search-input" placeholder="Buscar por nombre, ID o dirección...">
+        </div>
+        <div id="search-results" style="margin-top: 15px; max-height: 250px; overflow-y: auto;">
+          <!-- Resultados dinámicos -->
+        </div>
+      </div>
+
+      <!-- SECCIÓN EXCLUSIVA DE ADMINS: IMPORTACIONES Y Wispro -->
+      <div id="admin-actions" class="card hidden">
+        <h3>⚙️ Herramientas de Administrador</h3>
+        <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+          <button class="btn" id="btn-sync-wispro">🔄 Importar / sincronizar desde Wispro</button>
+          <button class="btn btn-secondary" id="btn-download-json">Descargar CSV Wispro</button>
+        </div>
+        
+        <div style="margin-top: 20px; border-top: 1px solid var(--border); padding-top: 15px;">
+          <h4>📥 Importar desde CSV Local</h4>
+          <input type="file" id="csv-file" accept=".csv" style="padding: 5px;">
+        </div>
+      </div>
+
+      <!-- FORMULARIO DE DESPACHO / NUEVA ASISTENCIA (Campos Expandidos) -->
+      <div class="card">
+        <h3>📋 Nueva Asistencia (Despacho)</h3>
+        <form id="form-asistencia">
+          <div class="form-group">
+            <label>Cliente / Titular</label>
+            <input type="text" id="asistencia-cliente" required placeholder="Nombre completo del cliente">
+          </div>
+          
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div class="form-group">
+              <label>Teléfono</label>
+              <input type="text" id="asistencia-tel" placeholder="Ej: 1123456789">
+            </div>
+            <div class="form-group">
+              <label>Plan Actual</label>
+              <input type="text" id="asistencia-plan" placeholder="Ej: Fibra 50 Megas">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Dirección</label>
+            <input type="text" id="asistencia-dir" required placeholder="Calle, Número, Localidad">
+          </div>
+
+          <!-- CAMPO NUEVO SOLICITADO: LINK DE TICKET -->
+          <div class="form-group">
+            <label>🔗 Enlace / Link del Ticket</label>
+            <input type="url" id="asistencia-ticket-link" placeholder="https://ejemplo.com">
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div class="form-group">
+              <label>Prioridad</label>
+              <select id="asistencia-prioridad">
+                <option value="baja">Baja</option>
+                <option value="media" selected>Media</option>
+                <option value="alta">Alta</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Asignar Técnico</label>
+              <select id="asistencia-tecnico">
+                <option value="">Seleccionar (Opcional)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <button type="button" class="btn btn-secondary" id="btn-geo">📍 Usar mi ubicación actual</button>
+            <span id="geo-status" style="font-size: 12px; margin-left: 10px; color: var(--text-muted);"></span>
+          </div>
+
+          <button type="submit" class="btn" style="width: 100%;">Crear y asignar asistencia</button>
+        </form>
+      </div>
+
+      <!-- HISTORIAL / TAREAS REALIZADAS -->
+      <div class="card">
+        <h3>📋 Historial de Tareas Realizadas y Pendientes</h3>
+        <div id="tasks-list">
+          <!-- Carga dinámica desde Firestore -->
+          <p style="color: var(--text-muted);">No hay asistencias cargadas o registradas en el día.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- INTEGRACIÓN CON FIREBASE Y LÓGICA DE CONTROL -->
+  <script type="module">
+    import { initializeApp } from "https://gstatic.com";
+    import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://gstatic.com";
+    import { getFirestore, doc, getDoc, collection, addDoc, query, getDocs } from "https://gstatic.com";
+    import { firebaseConfig } from "./firebase-config.js";
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    let usuarioActual = null;
+    let datosWisproCache = [];
+
+    // URL de tu función en Firebase Cloud Functions v2
+    const FUNCION_WISPRO_URL = `https://run.app`; // Ajustar si cambia tu ruta de deploy
+
+    // Control de pantallas según estado de autenticación
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const userDoc = await getDoc(doc(db, "usuarios", user.uid));
+        if (userDoc.exists()) {
+          usuarioActual = { uid: user.uid, ...userDoc.data() };
+          
+          document.getElementById("login-screen").classList.add("hidden");
+          document.getElementById("main-screen").classList.remove("hidden");
+          
+          // Mostrar utilidades de Administrador solo si tiene rol admin
+          if (usuarioActual.rol === 'admin') {
+            document.getElementById("admin-actions").classList.remove("hidden");
+          }
+          
+          cargarHistorialTareas();
+          cargarListaTecnicos();
+        } else {
+          alert("Tu usuario no está registrado en la base de datos.");
+          signOut(auth);
+        }
+      } else {
+        document.getElementById("login-screen").classList.remove("hidden");
+        document.getElementById("main-screen").classList.add("hidden");
+        document.getElementById("admin-actions").classList.add("hidden");
+        usuarioActual = null;
+      }
+    });
+
+    // Login
+    document.getElementById("btn-login").addEventListener("click", async () => {
+      const email = document.getElementById("login-email").value;
+      const pass = document.getElementById("login-pass").value;
+      try {
+        await signInWithEmailAndPassword(auth, email, pass);
+      } catch (err) {
+        alert("Error al iniciar sesión: " + err.message);
+      }
+    });
+
+    // Logout
+    document.getElementById("btn-logout").addEventListener("click", () => signOut(auth));
+
+    // Sincronizar desde tu backend de Firebase

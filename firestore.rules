@@ -1,0 +1,34 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signed() {
+      return request.auth != null && exists(/databases/$(database)/documents/usuarios/$(request.auth.uid));
+    }
+    function admin() {
+      return signed() && get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data.rol == 'admin';
+    }
+
+    match /usuarios/{u} {
+      allow read: if request.auth != null && (request.auth.uid == u || admin());
+      allow write: if admin();
+    }
+    match /clientes/{id} {
+      allow read, write: if admin();
+    }
+    match /tecnicos/{id} {
+      allow read: if signed();
+      allow write: if admin();
+    }
+    match /asistencias/{id} {
+      allow read: if admin() || (signed() && request.auth.uid in resource.data.tecnicos);
+      allow create, delete: if admin();
+      allow update: if admin() || (signed()
+        && request.auth.uid in resource.data.tecnicos
+        && request.resource.data.tecnicos == resource.data.tecnicos);
+    }
+    match /fotos/{id} {
+      allow read, create: if signed();
+      allow update, delete: if admin();
+    }
+  }
+}
