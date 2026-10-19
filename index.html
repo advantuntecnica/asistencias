@@ -2,7 +2,7 @@
 <html lang="es"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Asistencias técnicas</title>
-<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1d6fe0"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" id="theme-color" content="#1d6fe0"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes">
 <style>
 :root{--bg:#f6f7f9;--card:#fff;--tx:#1b1f24;--mut:#6a7280;--bd:#e1e4e8;--ac:#1d6fe0;--ok:#1a9d55;--wa:#d98a00;--bad:#d93a3a;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14171b;--card:#1d2228;--tx:#e8eaed;--mut:#98a1ad;--bd:#2d343c;--ac:#5a9bff;--ok:#38c077;--wa:#f0a93a;--bad:#ff6b6b}}
@@ -57,9 +57,75 @@ em{font-size:10px;color:var(--mut)}
 .grid3 label{display:block;font-size:12px;color:var(--mut)}
 .b-Sin{background:#9b4dca}.e-Sin{color:#9b4dca;border-color:#9b4dca}
 #toast{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--tx);color:var(--bg);padding:10px 14px;border-radius:10px;display:none;z-index:9;max-width:90%}
-</style></head>
+
+/* Interfaz renovada y adaptable */
+:root{--ac:#1769d2;--radius:16px}
+body{font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+header{box-shadow:0 3px 14px rgba(20,35,60,.06);backdrop-filter:blur(12px)}
+h1{font-size:clamp(18px,2.5vw,23px);font-weight:750;letter-spacing:-.025em;padding:16px 18px 10px}
+nav{gap:7px;padding:0 14px 12px;scrollbar-width:thin}
+nav button{border-radius:11px;padding:10px 14px;font-weight:650;min-height:42px}
+main{max-width:1100px;padding:clamp(12px,2.5vw,24px)}
+button,select,input,textarea{border-radius:10px;min-height:42px;transition:border-color .15s,box-shadow .15s}
+button{font-weight:600}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible{outline:3px solid color-mix(in srgb,var(--ac) 28%,transparent);outline-offset:2px}
+input:focus,select:focus,textarea:focus{border-color:var(--ac);box-shadow:0 0 0 3px color-mix(in srgb,var(--ac) 12%,transparent)}
+.card{border-radius:var(--radius);padding:clamp(14px,2vw,20px);margin:12px 0;box-shadow:0 3px 12px rgba(20,35,60,.035)}
+.grid{gap:12px}
+.mut{line-height:1.5}
+.chip{font-weight:650;padding:4px 10px}
+.pri{box-shadow:0 2px 5px rgba(23,105,210,.14)}
+#s-cli .fold{background:var(--card);border:1px solid var(--bd);border-radius:14px;margin:10px 0;overflow:hidden}
+#s-cli .fold summary{list-style:none;display:flex;align-items:center;gap:12px;padding:15px 17px;cursor:pointer;user-select:none;min-height:68px}
+#s-cli .fold summary::-webkit-details-marker{display:none}
+#s-cli .fold summary:hover{background:color-mix(in srgb,var(--ac) 4%,var(--card))}
+#s-cli .fold summary>span:nth-child(2){display:flex;flex-direction:column;gap:2px}
+#s-cli .fold summary strong{font-size:15px}
+#s-cli .fold summary small{font-size:12px;color:var(--mut)}
+.fold-icon{width:36px;height:36px;display:grid;place-items:center;flex-shrink:0;border-radius:11px;background:color-mix(in srgb,var(--ac) 10%,var(--card));color:var(--ac);font-size:20px;font-weight:700}
+#s-cli .fold[open] .fold-icon{transform:rotate(45deg)}
+.fold-content{padding:0 17px 17px;border-top:1px solid var(--bd)}
+.client-tools{display:grid;grid-template-columns:minmax(0,1fr) minmax(240px,420px);gap:14px;align-items:center;margin:24px 0 12px}
+.client-tools h2{font-size:21px;letter-spacing:-.02em;margin:0}
+.client-tools p{margin:2px 0 0}
+#l-cli .card{display:flex;align-items:flex-start;gap:12px}
+#l-cli .card>div:first-child{min-width:0;overflow-wrap:anywhere}
+#l-cli .card b{font-size:15px}
+#l-cli .del{flex-shrink:0}
+@media(max-width:600px){
+ header{position:sticky}
+ h1{padding:13px 12px 8px}
+ nav{padding:0 10px 10px;gap:6px}
+ nav button{flex:0 0 auto;padding:9px 12px;font-size:13px}
+ main{padding:10px}
+ .card{margin:9px 0;padding:13px;border-radius:13px}
+ .row{gap:7px}
+ .row>input,.row>select{min-width:100%;width:100%}
+ .row button{flex:1 1 auto}
+ .grid{grid-template-columns:1fr;gap:10px}
+ .grid3{grid-template-columns:1fr 1fr}
+ .grid3 label:last-child{grid-column:1/-1}
+ .cal{gap:2px}
+ .day{min-height:52px;padding:3px;font-size:11px}
+ .bar{font-size:9px}
+ #s-cli .fold summary{padding:13px;min-height:64px}
+ .fold-content{padding:0 13px 14px}
+ .client-tools{grid-template-columns:1fr;gap:10px;margin:22px 0 12px}
+ #l-cli .card{padding:13px;gap:8px}
+ #l-cli .card .mut{overflow-wrap:anywhere}
+ #login .card{max-width:420px}
+ button,.filebtn{min-height:42px}
+ .sig{height:130px}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+
+#theme-toggle{white-space:nowrap;margin:6px 0;font-size:13px;padding:8px 10px;min-height:38px}
+@media(max-width:420px){#theme-toggle{font-size:12px;padding:7px 8px}}
+</style>
+<script>try{const savedTheme=localStorage.getItem('asistencias-theme');if(savedTheme==='light'||savedTheme==='dark')document.documentElement.dataset.theme=savedTheme;else document.documentElement.dataset.theme='light'}catch(e){document.documentElement.dataset.theme='light'}</script>
+</head>
 <body>
-<header><div class="row" style="justify-content:space-between;padding-right:10px"><h1>🛠️ Asistencias técnicas</h1><button id="out" hidden>Salir</button></div>
+<header><div class="row" style="justify-content:space-between;padding-right:10px"><h1>🛠️ Asistencias técnicas</h1><div class="row" style="gap:6px;justify-content:flex-end"><button id="theme-toggle" type="button" aria-label="Cambiar tema" title="Cambiar entre tema claro y oscuro">🌙 Modo oscuro</button><button id="out" hidden>Salir</button></div></div>
 <nav id="tabs"></nav></header>
 <main>
 <p id="msg" class="mut" hidden></p>
@@ -88,27 +154,36 @@ em{font-size:10px;color:var(--mut)}
 </section>
 
 <section id="s-cli" hidden>
- <div class="card"><b>Nuevo cliente</b>
-  <div class="grid" style="margin-top:8px">
-   <input id="c-nom" placeholder="Nombre / Razón social">
-   <input id="c-dir" placeholder="Dirección">
-   <input id="c-tel" placeholder="Teléfono" inputmode="tel">
-   <input id="c-plan" placeholder="Plan (ej: 100 Mb)">
-   <input id="c-email" type="email" placeholder="Email del cliente (opcional)">
+ <details class="fold">
+  <summary><span class="fold-icon">＋</span><span><strong>Nuevo cliente</strong><small>Cargar un cliente manualmente</small></span></summary>
+  <div class="fold-content">
+   <div class="grid" style="margin-top:8px">
+    <input id="c-nom" placeholder="Nombre / Razón social">
+    <input id="c-dir" placeholder="Dirección">
+    <input id="c-tel" placeholder="Teléfono" inputmode="tel">
+    <input id="c-plan" placeholder="Plan (ej: 100 Mb)">
+    <input id="c-email" type="email" placeholder="Email del cliente (opcional)">
+   </div>
+   <p><button class="pri" data-act="addcli">Guardar cliente</button></p>
   </div>
-  <p><button class="pri" data-act="addcli">Guardar cliente</button></p>
- </div>
- <div class="card"><b>Importar desde Wispro Cloud</b>
-  <p class="mut">Importa los clientes, contratos y planes de Wispro a esta aplicación (sin usuarios ni contraseñas PPPoE: esos datos se consultan en el momento desde la pestaña Buscar). Se puede repetir las veces que haga falta: solo se guardan los cambios.</p>
-  <div class="row"><button class="pri" data-act="wispro">🔄 Importar / sincronizar desde Wispro</button><button data-act="wispro-json">Descargar JSON</button><button data-act="wispro-campos">Ver campos</button></div>
-  <p id="wispro-st" class="mut" aria-live="polite"></p>
- </div>
- <div class="card"><b>Importar desde CSV</b>
-  <p class="mut">Archivo .csv con encabezado: nombre, direccion, telefono, plan (separado por coma o punto y coma; en Excel: Guardar como → CSV). Los clientes que ya existen (mismo nombre y dirección) se omiten. Máximo 500 filas por carga.</p>
-  <input type="file" id="csv" accept=".csv,.txt,text/csv">
-  <p id="csv-st" class="mut"></p>
- </div>
- <input id="c-q" placeholder="Filtrar clientes…">
+ </details>
+ <details class="fold">
+  <summary><span class="fold-icon">⇄</span><span><strong>Importar desde Wispro Cloud</strong><small>Sincronizar clientes, contratos y planes</small></span></summary>
+  <div class="fold-content">
+   <p class="mut">Importa los clientes, contratos y planes de Wispro a esta aplicación (sin usuarios ni contraseñas PPPoE: esos datos se consultan en el momento desde la pestaña Buscar). Se puede repetir las veces que haga falta: solo se guardan los cambios.</p>
+   <div class="row"><button class="pri" data-act="wispro">🔄 Importar / sincronizar desde Wispro</button><button data-act="wispro-json">Descargar JSON</button><button data-act="wispro-campos">Ver campos</button></div>
+   <p id="wispro-st" class="mut" aria-live="polite"></p>
+  </div>
+ </details>
+ <details class="fold">
+  <summary><span class="fold-icon">⇧</span><span><strong>Importar desde CSV</strong><small>Cargar una lista de clientes desde un archivo</small></span></summary>
+  <div class="fold-content">
+   <p class="mut">Archivo .csv con encabezado: nombre, direccion, telefono, plan (separado por coma o punto y coma; en Excel: Guardar como → CSV). Los clientes que ya existen (mismo nombre y dirección) se omiten. Máximo 500 filas por carga.</p>
+   <input type="file" id="csv" accept=".csv,.txt,text/csv">
+   <p id="csv-st" class="mut" aria-live="polite"></p>
+  </div>
+ </details>
+ <div class="client-tools"><div><h2>Clientes</h2><p class="mut">Buscá y consultá los clientes cargados.</p></div><input id="c-q" placeholder="🔎 Filtrar por nombre, dirección o teléfono…"></div>
  <div id="l-cli"></div>
 </section>
 
@@ -626,6 +701,19 @@ document.addEventListener('change',e=>{
 $('#c-q').addEventListener('input',render);
 document.addEventListener('input',e=>{const d=e.target.dataset;if(!d)return;if('fintxt' in d)finTxt=e.target.value;if('finfirmante' in d)finFirmante=e.target.value;if('finmail' in d)finMail=e.target.value});
 document.addEventListener('focusout',()=>{if(pending)setTimeout(render,50)});
+
+const themeToggle=document.getElementById('theme-toggle');
+function applyTheme(theme){
+ if(theme!=='dark'&&theme!=='light')theme='light';
+ document.documentElement.dataset.theme=theme;
+ try{localStorage.setItem('asistencias-theme',theme)}catch(e){}
+ themeToggle.textContent=theme==='dark'?'☀️ Modo claro':'🌙 Modo oscuro';
+ themeToggle.setAttribute('aria-label',theme==='dark'?'Activar modo claro':'Activar modo oscuro');
+ themeToggle.title=theme==='dark'?'Cambiar a interfaz clara':'Cambiar a interfaz oscura';
+ const meta=document.getElementById('theme-color');if(meta)meta.setAttribute('content',theme==='dark'?'#14171b':'#1d6fe0');
+}
+applyTheme(document.documentElement.dataset.theme||'light');
+themeToggle.addEventListener('click',()=>applyTheme(document.documentElement.dataset.theme==='dark'?'light':'dark'));
 
 const fbApp=initializeApp(firebaseConfig),auth=getAuth(fbApp),fdb=getFirestore(fbApp);
 const auth2=getAuth(initializeApp(firebaseConfig,'sec'));
