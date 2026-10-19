@@ -1,8 +1,0 @@
-export const firebaseConfig = {
-  apiKey: "AIzaSyBz8UMEOOZ9n6unW-n_xXlnBv1XqdWVDfU",
-  authDomain: "ticket-fcce5.firebaseapp.com",
-  projectId: "ticket-fcce5",
-  storageBucket: "ticket-fcce5.firebasestorage.app",
-  messagingSenderId: "597575091640",
-  appId: "1:597575091640:web:3f5861be323276bc05bb4d"
-};
