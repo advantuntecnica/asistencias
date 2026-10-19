@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Asistencias técnicas</title>
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1d6fe0"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes">
+<style>
+:root{--bg:#f6f7f9;--card:#fff;--tx:#1b1f24;--mut:#6a7280;--bd:#e1e4e8;--ac:#1d6fe0;--ok:#1a9d55;--wa:#d98a00;--bad:#d93a3a;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14171b;--card:#1d2228;--tx:#e8eaed;--mut:#98a1ad;--bd:#2d343c;--ac:#5a9bff;--ok:#38c077;--wa:#f0a93a;--bad:#ff6b6b}}
+:root[data-theme="dark"]{--bg:#14171b;--card:#1d2228;--tx:#e8eaed;--mut:#98a1ad;--bd:#2d343c;--ac:#5a9bff;--ok:#38c077;--wa:#f0a93a;--bad:#ff6b6b}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.4 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+header{background:var(--card);border-bottom:1px solid var(--bd);position:sticky;top:env(safe-area-inset-top,0px);z-index:5}
+h1{font-size:17px;margin:0;padding:12px 14px 4px}
+nav{display:flex;gap:4px;padding:0 10px 8px;overflow-x:auto}
+nav button{flex:1;white-space:nowrap}
+main{max-width:860px;margin:0 auto;padding:12px}
+button,select,input,textarea{font:inherit;color:var(--tx);background:var(--card);border:1px solid var(--bd);border-radius:8px;padding:8px 10px}
+button{cursor:pointer}
+button.on,button.pri{background:var(--ac);border-color:var(--ac);color:#fff}
+button.del{color:var(--bad);padding:4px 8px}
+input,select,textarea{width:100%}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px;margin:10px 0}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.row>input,.row>select{flex:1;min-width:120px;width:auto}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media (max-width:520px){.grid{grid-template-columns:1fr}}
+.mut{color:var(--mut);font-size:13px}
+.chip{font-size:12px;padding:2px 8px;border-radius:99px;border:1px solid var(--bd)}
+.p-Alta{color:var(--bad);border-color:var(--bad)}.p-Media{color:var(--wa);border-color:var(--wa)}.p-Baja{color:var(--mut)}
+.e-Pendiente{color:var(--wa)}.e-Encurso{color:var(--ac)}.e-Resuelta{color:var(--ok)}
+.note{background:var(--bg);border-radius:8px;padding:6px 8px;margin:6px 0;font-size:14px}
+.chk{display:flex;flex-wrap:wrap;gap:6px}
+.chk label{display:flex;gap:6px;align-items:center;border:1px solid var(--bd);border-radius:99px;padding:5px 10px}
+.chk input{width:auto}
+p{margin:6px 0}a{color:var(--ac)}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.dh{text-align:center;font-size:12px;color:var(--mut)}
+.day{min-height:64px;border:1px solid var(--bd);border-radius:8px;padding:3px;background:var(--card);cursor:pointer;overflow:hidden;font-size:12px}
+.day.sel{outline:2px solid var(--ac)}.day.today span{color:var(--ac);font-weight:700}
+.bar{display:block;font-style:normal;font-size:10px;line-height:1.3;padding:1px 3px;border-radius:4px;margin-top:2px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.b-Pendiente{background:var(--wa)}.b-Encurso{background:var(--ac)}.b-Resuelta{background:var(--ok)}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-left:8px;vertical-align:middle}
+em{font-size:10px;color:var(--mut)}
+.filebtn{cursor:pointer;border:1px solid var(--bd);border-radius:8px;padding:8px 10px;background:var(--card)}
+.ph{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.th{width:96px;height:96px;object-fit:cover;border-radius:8px;cursor:zoom-in}
+.th.big{width:100%;height:auto;max-height:70vh;object-fit:contain}
+#login{position:fixed;inset:0;background:var(--bg);z-index:20;display:flex;align-items:center;justify-content:center;padding:16px}
+#login[hidden]{display:none}
+#login .card{width:100%;max-width:360px}
+.sig{display:block;width:100%;height:150px;background:#fff;border:1px solid var(--bd);border-radius:8px;touch-action:none;margin:6px 0}
+#done{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:15;display:flex;align-items:center;justify-content:center;padding:16px}
+#done[hidden]{display:none}
+#done .card{width:100%;max-width:380px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.grid3 label{display:block;font-size:12px;color:var(--mut)}
+.b-Sin{background:#9b4dca}.e-Sin{color:#9b4dca;border-color:#9b4dca}
+#toast{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--tx);color:var(--bg);padding:10px 14px;border-radius:10px;display:none;z-index:9;max-width:90%}
+</style></head>
+<body>
+<header><div class="row" style="justify-content:space-between;padding-right:10px"><h1>🛠️ Asistencias técnicas</h1><button id="out" hidden>Salir</button></div>
+<nav id="tabs"></nav></header>
+<main>
+<p id="msg" class="mut" hidden></p>
+
+<section id="s-cal" hidden></section>
+
+<section id="s-asist">
+ <div class="card">
+  <b>Nueva asistencia</b>
+  <div class="grid" style="margin-top:8px">
+   <div><input id="cli" list="dl" placeholder="Buscar cliente afectado…" autocomplete="off"><datalist id="dl"></datalist></div>
+   <select id="pri"><option>Media</option><option>Alta</option><option>Baja</option></select>
+  </div>
+  <textarea id="prob" rows="2" placeholder="Problema (ej: sin internet, LOS rojo en ONU)" style="margin:8px 0"></textarea>
+  <input id="tkt" type="url" placeholder="🎫 Link del ticket (opcional)" style="margin-bottom:8px">
+  <div class="row" style="margin-bottom:8px"><label class="filebtn">🖼 Adjuntar imágenes<input type="file" id="desp-file" accept="image/*" multiple hidden></label><span class="mut" id="desp-n"></span></div>
+  <div class="row" style="margin-bottom:6px"><button type="button" data-act="mipos">📍 Usar mi ubicación actual</button><input id="ubic" placeholder="o pegá coordenadas / enlace de Google Maps"></div>
+  <div class="mut" id="ubic-st" style="margin-bottom:8px"></div>
+  <div class="grid3" style="margin-bottom:8px"><label>Fecha<input type="date" id="fec"></label><label>Desde<input type="time" id="hor"></label><label>Hasta<input type="time" id="hor2"></label></div>
+  <div class="mut" style="margin-bottom:4px">Asignar a (opcional: se puede hacer después tocando la carga en el calendario):</div>
+  <div class="chk" id="tchk"></div>
+  <p><button class="pri" data-act="crear">Crear y asignar</button></p>
+ </div>
+ <div class="row" id="filtros"></div>
+ <div id="lista"></div>
+</section>
+
+<section id="s-cli" hidden>
+ <div class="card"><b>Nuevo cliente</b>
+  <div class="grid" style="margin-top:8px">
+   <input id="c-nom" placeholder="Nombre / Razón social">
+   <input id="c-dir" placeholder="Dirección">
+   <input id="c-tel" placeholder="Teléfono" inputmode="tel">
+   <input id="c-plan" placeholder="Plan (ej: 100 Mb)">
+   <input id="c-email" type="email" placeholder="Email del cliente (opcional)">
+  </div>
+  <p><button class="pri" data-act="addcli">Guardar cliente</button></p>
+ </div>
+ <div class="card"><b>Importar desde Wispro Cloud</b>
+  <p class="mut">Importa los clientes, contratos y planes de Wispro a esta aplicación (sin usuarios ni contraseñas PPPoE: esos datos se consultan en el momento desde la pestaña Buscar). Se puede repetir las veces que haga falta: solo se guardan los cambios.</p>
+  <div class="row"><button class="pri" data-act="wispro">🔄 Importar / sincronizar desde Wispro</button><button data-act="wispro-json">Descargar JSON</button><button data-act="wispro-campos">Ver campos</button></div>
+  <p id="wispro-st" class="mut" aria-live="polite"></p>
+ </div>
+ <div class="card"><b>Importar desde CSV</b>
+  <p class="mut">Archivo .csv con encabezado: nombre, direccion, telefono, plan (separado por coma o punto y coma; en Excel: Guardar como → CSV). Los clientes que ya existen (mismo nombre y dirección) se omiten. Máximo 500 filas por carga.</p>
+  <input type="file" id="csv" accept=".csv,.txt,text/csv">
+  <p id="csv-st" class="mut"></p>
+ </div>
+ <input id="c-q" placeholder="Filtrar clientes…">
+ <div id="l-cli"></div>
+</section>
+
+<section id="s-tec" hidden>
+ <div class="card"><b>Nuevo técnico</b>
+  <div class="grid" style="margin-top:8px"><input id="t-nom" placeholder="Nombre del técnico"><input id="t-mail" type="email" placeholder="Email (con el que va a ingresar)"><input id="t-pass" placeholder="Contraseña inicial (mín. 6)"></div><p><button class="pri" data-act="addtec">Crear técnico y cuenta</button></p>
+ </div>
+ <div id="l-tec"></div>
+</section>
+
+<section id="s-bus" hidden>
+ <div class="card"><b>🔍 Buscar cliente en Wispro</b>
+  <input id="b-q" placeholder="Nombre, ID de cliente, DNI, email, teléfono o dirección…" autocomplete="off" style="margin-top:8px">
+  <p class="mut" id="b-st"></p>
+ </div>
+ <div id="b-res"></div>
+</section>
+
+<section id="s-mi" hidden>
+ <div class="card" id="mebox"><div class="mut">¿Quién sos?</div><select id="me"></select></div>
+ <div id="l-mi"></div>
+</section>
+</main>
+<div id="login"><div class="card"><h2 style="margin:0 0 4px">🛠️ Asistencias técnicas</h2><p class="mut">Ingresá con tu cuenta.</p><input id="l-mail" type="email" placeholder="Email" autocomplete="username" style="margin-bottom:8px"><input id="l-pass" type="password" placeholder="Contraseña" autocomplete="current-password"><p id="login-err" style="color:var(--bad)"></p><button class="pri" id="login-btn" style="width:100%">Ingresar</button></div></div>
+<div id="done" hidden><div class="card"><h3 style="margin:0 0 6px">✅ Asistencia finalizada</h3><p class="mut" id="done-t"></p><div class="row"><button class="pri" id="done-send">✉️ Enviar PDF</button><button id="done-pdf">📄 Descargar</button><button id="done-close">Cerrar</button></div></div></div>
+<div id="toast"></div>
+
+<script type="module">
+import {initializeApp} from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';
+import {getAuth,onAuthStateChanged,signInWithEmailAndPassword,signOut,createUserWithEmailAndPassword} from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';
+import {getFirestore,doc as fdoc,collection as fcol,setDoc,updateDoc,deleteDoc,addDoc,getDoc,getDocs,onSnapshot as fsnap,query as fquery,where as fwhere} from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';
+import {firebaseConfig} from './firebase-config.js';
+import * as CFG from './firebase-config.js';
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid=p=>p+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const S={cli:[],tec:[],asi:[]};
+let db=null,U=null,myId=null,isAdmin=false,tab='mi',fil='activas',me='',pending=false,editing=null,finishing=null,finTxt='',finFiles=[],finBusy=false,finProc=0,finSig='',finSigT='',finFirmante='',finLoc='',finSend=false,finMail='',drawing=false,doneA=null,despLoc=null,myName='',busRes=[],busSt='',busQ='',hist={},redInfo={},linking=null,ctec='',cday='',cm=new Date();
+const ph={},PROF={},pdfCache={};
+let wisproCache=null;const WISPRO_URL=(CFG.wisproUrl&&!/NOMBRE/.test(CFG.wisproUrl))?CFG.wisproUrl:'/api/wispro';
+const pad=n=>String(n).padStart(2,'0');
+const ymd=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+cm.setDate(1);cday=ymd(new Date());
+const fmtF=s=>{const[y,m,d]=s.split('-');return d+'/'+m+'/'+y};
+const byF=(a,b)=>((a.fecha||'9999')+(a.hora||'')).localeCompare((b.fecha||'9999')+(b.hora||''));
+const linked=()=>myId&&S.tec.find(t=>t.userId===myId);
+try{me=localStorage.getItem('me')||''}catch(e){}
+const tl=()=>isAdmin?[['cal','Calendario'],['asist','Despacho'],['bus','Buscar'],['cli','Clientes'],['tec','Técnicos'],['mi','Mis tareas']]:[['mi','Mis tareas'],['cal','Calendario'],['bus','Buscar']];
+const lab=c=>c.nombre+(c.direccion?' · '+c.direccion:'');
+const nm=id=>(S.tec.find(t=>t.id===id)||{}).nombre||'?';
+function toast(t,ms){const e=$('#toast');e.textContent=t;e.style.display='block';clearTimeout(toast.h);toast.h=setTimeout(()=>e.style.display='none',ms||3200)}
+async function w(fn){try{await fn()}catch(e){toast(e&&e.code==='permission-denied'?'No tenés permiso para hacer esto.':e&&e.code?'Error: '+e.code:'No se pudo guardar. Reintentá.')}}
+
+function tabs(){
+ const T=tl();if(!T.some(x=>x[0]===tab))tab=T[0][0];
+ $('#tabs').innerHTML=T.map(([k,v])=>`<button data-tab="${k}" class="${k===tab?'on':''}">${v}</button>`).join('');
+ for(const k of ['cal','asist','bus','cli','tec','mi'])$('#s-'+k).hidden=k!==tab;
+}
+function cards(l){
+ if(!l.length)return '<p class="mut">No hay asistencias.</p>';
+ return l.map(a=>{const id=a.id,done=a.estado==='Resuelta',nF=(a.nFotosDesp||0)+(a.nFotos||0)+(a.tieneFirma?1:0)+(a.tieneFirmaTec?1:0);
+ return `<div class="card">
+ <div class="row"><b>${esc(a.clienteNombre)}</b><span class="chip p-${esc(a.prioridad)}">${esc(a.prioridad)}</span><span class="chip e-${esc((a.estado||'').replace(' ',''))}">${esc(a.estado)}</span>${!done&&!(a.tecnicos||[]).length?'<span class="chip e-Sin">Sin técnico</span>':''}</div>
+ <div class="mut">${a.fecha?'🗓 '+esc(fmtF(a.fecha))+(a.hora?' '+esc(a.hora)+(a.horaFin?'–'+esc(a.horaFin):''):'')+' · ':''}${esc(a.direccion)} ${a.ubicacion&&a.ubicacion.lat?`<a target="_blank" rel="noopener" href="https://www.google.com/maps?q=${Number(a.ubicacion.lat)},${Number(a.ubicacion.lng)}">📍 Ubicación exacta</a>`:a.direccion?`<a target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(a.direccion)}">📍 Mapa</a>`:''}${a.telefono?` · <a href="tel:${esc(a.telefono)}">${esc(a.telefono)}</a>`:''}</div>
+ <p>${esc(a.problema)}</p>
+ ${a.ticket&&/^https?:\/\//i.test(a.ticket)?`<div class="mut">🎫 <a target="_blank" rel="noopener" href="${esc(a.ticket)}">Abrir ticket</a></div>`:''}
+ <div class="mut">${a.creadoPorNombre?'Cargado por '+esc(a.creadoPorNombre)+(a.createdAt?' · '+esc(new Date(a.createdAt).toLocaleString('es-AR',{dateStyle:'short',timeStyle:'short'})):''):''}</div>
+ <div class="mut">👷 ${esc((a.tecnicos||[]).map(nm).join(', ')||'Sin asignar')}</div>
+ ${(a.notas||[]).map(n=>`<div class="note">${esc(n.txt)} <span class="mut">— ${esc(n.by)} · ${new Date(n.t).toLocaleString('es-AR',{dateStyle:'short',timeStyle:'short'})}</span></div>`).join('')}
+ ${a.informe?`<div class="note"><b>✅ Informe${a.resueltaPor?' ('+esc(nm(a.resueltaPor))+')':''}:</b> ${esc(a.informe)}</div>`:''}
+ ${a.ubicacionCierre&&a.ubicacionCierre.lat?`<div class="mut">📍 Cierre: <a target="_blank" rel="noopener" href="https://www.google.com/maps?q=${Number(a.ubicacionCierre.lat)},${Number(a.ubicacionCierre.lng)}">ver ubicación</a> (±${Math.round(Number(a.ubicacionCierre.acc)||0)} m)</div>`:''}
+ ${a.firmante?`<div class="mut">✍️ Firmó: ${esc(a.firmante)}</div>`:''}
+ ${a.tieneFirmaTec?`<div class="mut">✍️ Firma del técnico: ${esc(a.firmaTecNombre||'')}</div>`:''}
+ ${a.enviarPdf?`<div class="mut">✉️ PDF para ${esc(a.emailDestino||'')}: ${a.pdfEnviado?'enviado':'pendiente de enviar'}</div>`:''}
+ ${nF?`<button data-act="fotos" data-id="${id}">📷 ${ph[id]?'Ocultar':'Ver'} imágenes (${nF})</button>`:''}
+ ${ph[id]?(ph[id]==='load'?'<div class="ph"><span class="mut">Cargando…</span></div>':ph[id].length?['despacho','cierre','firma','firmaTec'].map(k=>{const l2=ph[id].filter(x=>(x.tipo||'cierre')===k);return l2.length?`<div class="mut">${{despacho:'Adjuntos del despacho',cierre:'Fotos del cierre',firma:'Firma del cliente',firmaTec:'Firma del técnico'}[k]}</div><div class="ph">${l2.map(x=>`<img class="th" src="${esc(x.data)}" alt="${k}">`).join('')}</div>`:''}).join(''):'<div class="ph"><span class="mut">Sin imágenes.</span></div>'):''}
+ <div class="row" style="margin-top:8px"><select data-act="estado" data-id="${id}" style="max-width:130px">${(isAdmin||done?['Pendiente','En curso','Resuelta']:['Pendiente','En curso']).map(e=>`<option${e===a.estado?' selected':''}>${e}</option>`).join('')}</select>
+ <input data-note="${id}" placeholder="Agregar nota…"><button data-act="nota" data-id="${id}">Nota</button>${String(a.clienteId||'').startsWith('wispro_')?`<button data-act="red" data-id="${id}">🔌 Datos de red</button>`:''}${isAdmin?`<button${(a.tecnicos||[]).length?'':' class="pri"'} data-act="reasig" data-id="${id}">${(a.tecnicos||[]).length?'Reasignar':'Asignar técnicos'}</button>`:''}${done?`<button data-act="pdf" data-id="${id}">📄 PDF</button><button data-act="enviar" data-id="${id}">✉️ Enviar</button>`:`<button class="pri" data-act="fin" data-id="${id}">Finalizar</button>`}</div>
+ ${redInfo[id]?(redInfo[id]==='load'?'<div class="mut">Consultando Wispro…</div>':redInfo[id].error?`<div class="mut">No se pudo consultar Wispro: ${esc(redInfo[id].error)}</div>`:`<div class="note">${fichaWispro(redInfo[id])}</div>`):''}
+ ${isAdmin&&editing===id?`<div class="chk reasig" data-reasig="${id}" style="margin-top:8px">${S.tec.map(t=>`<label><input type="checkbox" value="${t.id}"${(a.tecnicos||[]).includes(t.id)?' checked':''}>${esc(t.nombre)}</label>`).join('')}</div><div class="row" style="margin-top:8px"><button class="pri" data-act="savereasig" data-id="${id}">Guardar técnicos</button><button data-act="reasig" data-id="${id}">Cancelar</button></div>`:''}
+ ${finishing===id?`<div class="fin" style="margin-top:8px"><textarea data-fintxt rows="3" placeholder="¿Qué hiciste? (diagnóstico, trabajo realizado, materiales usados)">${esc(finTxt)}</textarea>
+ <div class="row" style="margin:8px 0"><label class="filebtn">📷 Agregar fotos<input type="file" class="fin-file" accept="image/*" multiple hidden></label><span class="mut">${finFiles.length} foto(s)</span>${finFiles.length?'<button data-act="finclear">Quitar fotos</button>':''}</div>
+ <div class="mut">✍️ Firma del cliente (que firme con el dedo)</div>
+ <canvas class="sig" data-sig="c" width="600" height="220"></canvas>
+ <div class="row" style="margin-bottom:8px"><input data-finfirmante placeholder="Nombre y apellido de quien firma" value="${esc(finFirmante)}"><button data-act="sigclear">Borrar firma</button></div>
+ <div class="mut">✍️ Firma del técnico: ${esc(me?nm(me):myName)}</div>
+ <canvas class="sig" data-sig="t" width="600" height="220"></canvas>
+ <div class="row" style="margin-bottom:8px"><button data-act="sigclearT">Borrar firma del técnico</button></div>
+ <div class="mut">${finLoc&&finLoc.lat?'📍 Ubicación lista (±'+Math.round(finLoc.acc||0)+' m)':finLoc==='x'?'📍 Sin ubicación: permití el acceso a la ubicación del navegador':'📍 Buscando ubicación…'}</div>
+ <label style="display:flex;gap:8px;align-items:center;margin:8px 0"><input type="checkbox" data-finsend style="width:auto"${finSend?' checked':''}>Enviar la orden en PDF al cliente</label>
+ <input data-finmail type="email" placeholder="Email del cliente" value="${esc(finMail)}" style="margin-bottom:8px">
+ <div class="row"><button class="pri" data-act="finsave" data-id="${id}"${finBusy?' disabled':''}>${finBusy?'Guardando…':'Guardar y cerrar asistencia'}</button><button data-act="fin" data-id="${id}">Cancelar</button></div></div>`:''}
+ </div>`}).join('');
+}
+function render(){
+ if(document.activeElement&&document.activeElement.closest&&document.activeElement.closest('.card input[data-note], .reasig input, .fin textarea, .fin input[data-finfirmante], .fin input[data-finmail]')){pending=true;return}
+ if(drawing){pending=true;return}
+ pending=false;const lk=linked();if(lk)me=lk.id;tabs();
+ if(!db){const m=$('#msg');m.hidden=false;m.textContent='Iniciá sesión para continuar.';return}
+ const asi=[...S.asi].sort((a,b)=>b.createdAt-a.createdAt);
+ // datalist y checkboxes de técnicos (conservando selección)
+ $('#dl').innerHTML=S.cli.map(c=>`<option value="${esc(lab(c))}">`).join('');
+ const sel=new Set([...document.querySelectorAll('#tchk input:checked')].map(i=>i.value));
+ $('#tchk').innerHTML=S.tec.length?S.tec.map(t=>`<label><input type="checkbox" value="${t.id}"${sel.has(t.id)?' checked':''}>${esc(t.nombre)}</label>`).join(''):'<span class="mut">Primero cargá técnicos en la pestaña Técnicos.</span>';
+ // despacho
+ const act=a=>a.estado!=='Resuelta';
+ const sin=a=>act(a)&&!(a.tecnicos||[]).length;const f=fil==='activas'?asi.filter(act):fil==='sin'?asi.filter(sin):fil==='resueltas'?asi.filter(a=>!act(a)):asi;
+ $('#filtros').innerHTML=[['activas','Activas ('+asi.filter(act).length+')'],['sin','Sin técnico ('+asi.filter(sin).length+')'],['resueltas','Resueltas'],['todas','Todas']].map(([k,v])=>`<button data-fil="${k}" class="${k===fil?'on':''}">${v}</button>`).join('');
+ $('#lista').innerHTML=cards(f);
+ // clientes
+ const q=$('#c-q').value.toLowerCase();
+ $('#l-cli').innerHTML=S.cli.filter(c=>(lab(c)+(c.telefono||'')).toLowerCase().includes(q)).sort((a,b)=>a.nombre.localeCompare(b.nombre)).map(c=>`<div class="card row"><div style="flex:1"><b>${esc(c.nombre)}</b><div class="mut">${esc(c.direccion)} · ${esc(c.telefono)} ${c.plan?'· '+esc(c.plan):''} ${c.email?'· '+esc(c.email):''}</div>${c.origen==='wispro'&&c.wisproContratos?.length?`<div class="mut">Wispro: ${c.wisproContratos.map(x=>[x.ip?'IP '+x.ip:'',x.mac_address?'MAC '+x.mac_address:'',x.state?'Estado '+x.state:'',x.plan_name?'Plan '+x.plan_name:''].filter(Boolean).map(esc).join(' · ')).join('<br>')}</div>`:''}</div><button class="del" data-del="clientes/${c.id}">Borrar</button></div>`).join('')||'<p class="mut">Sin clientes cargados.</p>';
+ // técnicos
+ $('#l-tec').innerHTML=S.tec.map(t=>`<div class="card row"><div style="flex:1"><b>${esc(t.nombre)}</b><div class="mut">${esc(t.email||'')}</div></div><button class="del" data-del="tecnicos/${t.id}">Borrar</button></div>`).join('')||'<p class="mut">Sin técnicos.</p>';
+ // mi día
+ $('#me').innerHTML='<option value="">Elegí tu nombre…</option>'+S.tec.map(t=>`<option value="${t.id}"${t.id===me?' selected':''}>${esc(t.nombre)}</option>`).join('');
+ $('#mebox').hidden=!!lk;
+ $('#l-mi').innerHTML=me?cards(asi.filter(a=>act(a)&&(a.tecnicos||[]).includes(me)).sort(byF)):'<p class="mut">Elegí tu nombre para ver tus asistencias (o pedile al administrador que vincule tu cuenta).</p>';
+ renderCal(asi);initSig();renderBus();
+}
+
+function renderCal(asi){
+ const list=asi.filter(a=>isAdmin?(!ctec||(a.tecnicos||[]).includes(ctec)):(a.tecnicos||[]).includes(me));
+ const by={},sf=[];
+ list.forEach(a=>{if(a.fecha)(by[a.fecha]=by[a.fecha]||[]).push(a);else if(a.estado!=='Resuelta')sf.push(a)});
+ for(const k in by)by[k].sort(byF);
+ const y=cm.getFullYear(),m=cm.getMonth(),off=(new Date(y,m,1).getDay()+6)%7,nd=new Date(y,m+1,0).getDate(),hoy=ymd(new Date());
+ let h=`<div class="row"><button data-cal="-1">‹</button><b style="flex:1;text-align:center;text-transform:capitalize">${esc(cm.toLocaleDateString('es-AR',{month:'long',year:'numeric'}))}</b><button data-cal="1">›</button><button data-cal="0">Hoy</button></div>`;
+ if(isAdmin)h+=`<select id="ctec" style="margin:8px 0"><option value="">Todos los técnicos</option>${S.tec.map(t=>`<option value="${t.id}"${t.id===ctec?' selected':''}>${esc(t.nombre)}</option>`).join('')}</select>`;
+ h+='<div class="cal" style="margin-top:8px">'+['L','M','M','J','V','S','D'].map(d=>`<div class="dh">${d}</div>`).join('');
+ for(let i=0;i<off;i++)h+='<div></div>';
+ for(let d=1;d<=nd;d++){const k=y+'-'+pad(m+1)+'-'+pad(d),it=by[k]||[];
+  h+=`<div class="day${k===cday?' sel':''}${k===hoy?' today':''}" data-day="${k}"><span>${d}</span>${it.slice(0,3).map(a=>`<i class="bar b-${(a.tecnicos||[]).length||a.estado==='Resuelta'?esc((a.estado||'').replace(' ','')):'Sin'}" data-aid="${a.id}">${esc(a.hora||'')} ${esc(a.clienteNombre)}</i>`).join('')}${it.length>3?`<em>+${it.length-3}</em>`:''}</div>`}
+ h+='</div><div class="mut" style="margin:8px 0"><span class="dot b-Pendiente"></span> Pendiente <span class="dot b-Encurso"></span> En curso <span class="dot b-Resuelta"></span> Resuelta <span class="dot b-Sin"></span> Sin técnico</div>';
+ h+=`<b>${esc(fmtF(cday))}</b>`+cards(by[cday]||[]);
+ if(sf.length)h+=`<p><b>Sin fecha asignada (${sf.length})</b></p>`+cards(sf);
+ $('#s-cal').innerHTML=h;
+}
+function shrink(f){return new Promise((ok,no)=>{
+ const r=new FileReader();
+ r.onerror=()=>no(new Error('lectura'));
+ r.onload=()=>{const im=new Image();
+  im.onerror=()=>no(new Error('imagen'));
+  im.onload=()=>{for(const mx of [1000,800,600])for(const q of [.65,.5,.4]){
+   const k=Math.min(1,mx/Math.max(im.width,im.height)),c=document.createElement('canvas');
+   c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);
+   c.getContext('2d').drawImage(im,0,0,c.width,c.height);
+   const d=c.toDataURL('image/jpeg',q);if(d.length<200000)return ok(d)}
+   no(new Error('grande'))};
+  im.src=r.result};
+ r.readAsDataURL(f)})}
+function getPos(){return new Promise(ok=>{
+ if(!navigator.geolocation)return ok(null);
+ navigator.geolocation.getCurrentPosition(p=>ok({lat:p.coords.latitude,lng:p.coords.longitude,acc:p.coords.accuracy,t:Date.now()}),()=>ok(null),{enableHighAccuracy:true,timeout:10000,maximumAge:0})})}
+let sigC=null,sigLast=null;
+const sigPos=(c,e)=>{const r=c.getBoundingClientRect();return{x:(e.clientX-r.left)*c.width/r.width,y:(e.clientY-r.top)*c.height/r.height}};
+function sigLine(c,a,b){const x=c.getContext('2d');x.lineWidth=3;x.lineCap='round';x.strokeStyle='#000';x.beginPath();x.moveTo(a.x,a.y);x.lineTo(b.x,b.y);x.stroke()}
+document.addEventListener('pointerdown',e=>{const c=e.target.closest&&e.target.closest('canvas.sig');if(!c)return;e.preventDefault();sigC=c;drawing=true;try{c.setPointerCapture(e.pointerId)}catch(x){}sigLast=sigPos(c,e);sigLine(c,sigLast,sigLast)});
+document.addEventListener('pointermove',e=>{if(!sigC)return;const p=sigPos(sigC,e);sigLine(sigC,sigLast,p);sigLast=p});
+document.addEventListener('pointerup',()=>{if(!sigC)return;{const u=sigC.toDataURL('image/png');if(sigC.dataset.sig==='t')finSigT=u;else finSig=u}sigC=null;drawing=false;if(pending)render()});
+function initSig(){document.querySelectorAll('canvas.sig').forEach(c=>{const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);const sv=c.dataset.sig==='t'?finSigT:finSig;if(sv){const im=new Image();im.onload=()=>x.drawImage(im,0,0,c.width,c.height);im.src=sv}})}
+function loadJsPDF(){return window.jspdf?Promise.resolve():new Promise((ok,no)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';s.onload=ok;s.onerror=()=>no(new Error('jspdf'));document.head.appendChild(s)})}
+const imgSize=src=>new Promise(ok=>{const i=new Image();i.onload=()=>ok({w:i.width,h:i.height});i.onerror=()=>ok(null);i.src=src});
+async function buildPDF(a){
+ await loadJsPDF();
+ const sn=await db.collection('fotos').where('asistId','==',a.id).get();
+ const fs=sn.docs.map(d=>d.data()).filter(x=>typeof x.data==='string'&&x.data.startsWith('data:image/'));
+ const d=new window.jspdf.jsPDF({unit:'mm',format:'a4'}),M=14,TW=182;
+ let y=18;
+ const need=h=>{if(y+h>282){d.addPage();y=18}};
+ const tx=(t,sz=10.5,b=false)=>{d.setFont('helvetica',b?'bold':'normal');d.setFontSize(sz);const ls=d.splitTextToSize(String(t==null?'':t),TW);need(ls.length*5+1);d.text(ls,M,y);y+=ls.length*5+1};
+ d.setFont('helvetica','bold');d.setFontSize(18);d.text('Orden de servicio',M,y);y+=8;
+ tx('N° '+a.id.slice(-6).toUpperCase()+(a.resueltaAt?'  |  Cierre: '+new Date(a.resueltaAt).toLocaleString('es-AR'):''),10);
+ y+=2;tx('Cliente',12,true);tx(a.clienteNombre);tx([a.direccion,a.telefono].filter(Boolean).join('  |  '));
+ y+=2;tx('Problema reportado',12,true);tx(a.problema);
+ tx('Prioridad: '+a.prioridad+(a.fecha?'  |  Programada: '+fmtF(a.fecha)+(a.hora?' '+a.hora+(a.horaFin?'-'+a.horaFin:''):''):''));
+ tx('Técnico(s): '+((a.tecnicos||[]).map(nm).join(', ')||'-'));if(a.creadoPorNombre)tx('Cargado por: '+a.creadoPorNombre);
+ if(a.informe){y+=2;tx('Trabajo realizado',12,true);tx(a.informe)}
+ if((a.notas||[]).length){y+=2;tx('Notas',12,true);a.notas.forEach(n=>tx('- '+n.txt+' ('+(n.by||'')+', '+new Date(n.t).toLocaleString('es-AR')+')',9.5))}
+ if(a.ubicacionCierre&&a.ubicacionCierre.lat){const u=a.ubicacionCierre;y+=2;tx('Ubicación del cierre',12,true);tx(Number(u.lat).toFixed(6)+', '+Number(u.lng).toFixed(6)+' (precisión ±'+Math.round(Number(u.acc)||0)+' m)');tx('https://www.google.com/maps?q='+u.lat+','+u.lng,9)}
+ const fotos=fs.filter(x=>(x.tipo||'cierre')==='cierre'),firma=fs.find(x=>x.tipo==='firma');
+ if(fotos.length){y+=3;tx('Fotos del cierre',12,true);let col=0,rowH=0;
+  for(const f of fotos){const s=await imgSize(f.data);if(!s)continue;let w=88,h=w*s.h/s.w;if(h>66){h=66;w=h*s.w/s.h}
+   if(col===0)need(h+4);
+   d.addImage(f.data,'JPEG',M+col*94,y,w,h);rowH=Math.max(rowH,h);col++;
+   if(col===2){y+=rowH+4;col=0;rowH=0}}
+  if(col===1)y+=rowH+4}
+ const firmaT=fs.find(x=>x.tipo==='firmaTec');
+ if(firma||firmaT){y+=3;need(52);const fh=80*220/600,y0=y;
+  d.setFont('helvetica','bold');d.setFontSize(11);
+  if(firma){d.text('Firma del cliente',M,y0);d.addImage(firma.data,'PNG',M,y0+2,80,fh)}
+  if(firmaT){d.text('Firma del técnico',M+94,y0);d.addImage(firmaT.data,'PNG',M+94,y0+2,80,fh)}
+  y=y0+fh+8;d.setFont('helvetica','normal');d.setFontSize(10);
+  if(firma&&a.firmante)d.text(String(a.firmante),M,y);
+  if(firmaT)d.text(String(a.firmaTecNombre||''),M+94,y);
+  y+=6}
+ return{blob:d.output('blob'),name:'orden-'+a.id.slice(-6)+'.pdf'};
+}
+async function entregar(a,enviar){
+ try{
+  let r=pdfCache[a.id];
+  if(!r){toast('Generando PDF…');r=await buildPDF(a);pdfCache[a.id]=r}
+  const file=new File([r.blob],r.name,{type:'application/pdf'});
+  if(enviar&&navigator.canShare&&navigator.canShare({files:[file]})){
+   try{
+    await navigator.share({files:[file],title:'Orden de servicio',text:'Orden de servicio - '+a.clienteNombre+(a.emailDestino?'. Enviar a: '+a.emailDestino:'')});
+    delete pdfCache[a.id];
+    if(a.enviarPdf&&!a.pdfEnviado)await db.doc('asistencias/'+a.id).update({pdfEnviado:true,pdfEnviadoAt:Date.now()});
+    $('#done').hidden=true;
+   }catch(e){
+    if(e&&e.name==='NotAllowedError')toast('PDF listo: tocá Enviar otra vez');
+    else if(e&&e.name!=='AbortError')toast('No se pudo compartir el PDF');
+   }
+   return;
+  }
+  const url=URL.createObjectURL(r.blob),l=document.createElement('a');
+  l.href=url;l.download=r.name;document.body.appendChild(l);l.click();l.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),4000);delete pdfCache[a.id];
+  if(enviar){const to=a.emailDestino||a.clienteEmail||'';toast('PDF descargado: adjuntalo en el mail');location.href='mailto:'+encodeURIComponent(to).replace('%40','@')+'?subject='+encodeURIComponent('Orden de servicio - '+a.clienteNombre)+'&body='+encodeURIComponent('Adjunto la orden de servicio (PDF).')}
+ }catch(e){toast('No se pudo generar el PDF. Revisá la conexión.')}
+}
+async function finalizar(id){
+ const txt=finTxt.trim();
+ if(!txt)return toast('Contá qué hiciste');
+ if(finProc)return toast('Esperá un momento: se están procesando las fotos');
+ if(finSend&&!/^\S+@\S+\.\S+$/.test(finMail.trim()))return toast('Poné un email válido del cliente');
+ if(finBusy||!db)return;
+ finBusy=true;render();
+ let paso='obtener la ubicación';
+ try{
+  const pos=(await getPos())||(finLoc&&finLoc.lat?finLoc:null);
+  let n=0;
+  paso='subir las fotos';
+  for(const data of finFiles){await db.collection('fotos').add({asistId:id,tipo:'cierre',data,t:Date.now(),by:me||''});n++}
+  paso='subir la firma del cliente';
+  if(finSig)await db.collection('fotos').add({asistId:id,tipo:'firma',data:finSig,t:Date.now(),by:me||''});
+  paso='subir la firma del técnico';
+  if(finSigT)await db.collection('fotos').add({asistId:id,tipo:'firmaTec',data:finSigT,t:Date.now(),by:me||''});
+  paso='cerrar la asistencia';
+  const as=S.asi.find(x=>x.id===id)||{};
+  const tn=me?nm(me):myName;
+  const upd={estado:'Resuelta',informe:txt,resueltaPor:me||null,resueltaAt:Date.now(),nFotos:(as.nFotos||0)+n,firmante:finFirmante.trim(),tieneFirma:!!finSig||!!as.tieneFirma,tieneFirmaTec:!!finSigT||!!as.tieneFirmaTec,firmaTecNombre:finSigT?tn:(as.firmaTecNombre||''),ubicacionCierre:pos,enviarPdf:finSend,emailDestino:finSend?finMail.trim():'',pdfEnviado:false};
+  await db.doc('asistencias/'+id).update(upd);
+  const send=finSend;
+  finishing=null;finTxt='';finFiles=[];finSig='';finSigT='';finFirmante='';finLoc='';finSend=false;finMail='';
+  if(send){doneA=Object.assign({},as,upd,{id});$('#done-t').textContent='Enviar a: '+upd.emailDestino;$('#done').hidden=false;buildPDF(doneA).then(r=>{pdfCache[id]=r}).catch(()=>{})}
+  else toast('Asistencia finalizada');
+ }catch(e){console.error(paso,e);toast('No se pudo '+paso+' ('+((e&&e.code)||(e&&e.message)||'error')+')',9000)}
+ finBusy=false;render();
+}
+async function buscar(q){
+ if(!U)return;
+ const r=await U.search(q);
+ $('#hits').innerHTML=r.length?r.map(p=>`<button data-act="vpick" data-uid="${esc(p.id)}" style="margin:4px 4px 0 0">${esc(p.name||'Sin nombre')}</button>`).join(''):'<span class="mut">Sin resultados. La persona tiene que estar en tu organización o invitada al artifact.</span>';
+}
+async function loadProf(){
+ if(!U)return;
+ const ids=[...new Set(S.tec.map(t=>t.userId).filter(Boolean))].filter(i=>!(i in PROF));
+ if(!ids.length)return;
+ const p=await U.profiles(ids);
+ ids.forEach(i=>PROF[i]=(p[i]&&p[i].name)||'Cuenta vinculada');render();
+}
+function parseUbic(t){
+ t=String(t||'').trim();
+ const m=t.match(/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/)||t.match(/(-?\d{1,3}\.\d+)\s*,\s*(-?\d{1,3}\.\d+)/);
+ if(!m)return null;
+ const lat=+m[1],lng=+m[2];
+ return Math.abs(lat)<=90&&Math.abs(lng)<=180?{lat,lng}:null;
+}
+function parseCSV(t){
+ t=t.replace(/^\uFEFF/,'');
+ const l1=t.split(/\r?\n/)[0]||'';
+ const d=(l1.match(/;/g)||[]).length>(l1.match(/,/g)||[]).length?';':',';
+ const rows=[];let r=[],f='',q=false;
+ for(let i=0;i<t.length;i++){const c=t[i];
+  if(q){if(c==='"'){if(t[i+1]==='"'){f+='"';i++}else q=false}else f+=c}
+  else if(c==='"')q=true;
+  else if(c===d){r.push(f);f=''}
+  else if(c==='\n'||c==='\r'){if(c==='\r'&&t[i+1]==='\n')i++;r.push(f);f='';rows.push(r);r=[]}
+  else f+=c}
+ if(f||r.length){r.push(f);rows.push(r)}
+ return rows.filter(r=>r.some(x=>x.trim()));
+}
+const norm=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+async function importCSV(file){
+ const st=$('#csv-st');
+ if(!db)return;
+ let rows;
+ try{rows=parseCSV(await file.text())}catch(e){st.textContent='No pude leer el archivo.';return}
+ if(!rows.length){st.textContent='El archivo está vacío.';return}
+ const al={nombre:['nombre','cliente','razon social','nombre y apellido'],direccion:['direccion','domicilio'],telefono:['telefono','tel','celular','movil'],plan:['plan','servicio','abono'],email:['email','correo','mail','e-mail']};
+ const hdr=rows[0].map(norm);
+ const idx={};let hasH=false;
+ for(const k in al){const i=hdr.findIndex(h=>al[k].includes(h));idx[k]=i;if(k==='nombre'&&i>=0)hasH=true}
+ let data=rows;
+ if(hasH)data=rows.slice(1);else{idx.nombre=0;idx.direccion=1;idx.telefono=2;idx.plan=3;idx.email=4}
+ const g=(r,k)=>idx[k]>=0?(r[idx[k]]||'').trim():'';
+ const seen=new Set(S.cli.map(c=>norm(c.nombre)+'|'+norm(c.direccion)));
+ const nuevos=[];let dup=0;
+ for(const r of data){const c={nombre:g(r,'nombre'),direccion:g(r,'direccion'),telefono:g(r,'telefono'),plan:g(r,'plan'),email:g(r,'email')};
+  if(!c.nombre)continue;const k=norm(c.nombre)+'|'+norm(c.direccion);
+  if(seen.has(k)){dup++;continue}seen.add(k);nuevos.push(c)}
+ if(nuevos.length>500){st.textContent='El archivo tiene '+nuevos.length+' clientes nuevos. Dividilo en partes de hasta 500.';return}
+ let ok=0;
+ try{for(const c of nuevos){await db.doc('clientes/'+uid('c')).set(c);ok++;if(ok%20===0)st.textContent='Importando… '+ok+' de '+nuevos.length}}
+ catch(e){st.textContent='Se importaron '+ok+' de '+nuevos.length+' y se detuvo ('+((e&&e.code)||'error')+'). Volvé a cargar el mismo archivo: los ya importados se omiten.';return}
+ st.textContent='Listo: '+ok+' importados, '+dup+' omitidos por duplicado.';
+}
+
+
+async function wApi(params){
+ const u=auth.currentUser;
+ if(!u)throw new Error('La sesión expiró. Volvé a ingresar.');
+ const tk=await u.getIdToken();
+ let r;
+ try{r=await fetch(WISPRO_URL+'?'+new URLSearchParams(params),{headers:{Accept:'application/json',Authorization:'Bearer '+tk}})}
+ catch(e){throw new Error('No se pudo conectar con el servicio de Wispro. Revisá wisproUrl en firebase-config.js y ALLOWED_ORIGIN en functions/.env (y volvé a desplegar la función).')}
+ const isJson=(r.headers.get('content-type')||'').includes('json');
+ const p=isJson?await r.json().catch(()=>({})):{};
+ if(!isJson)throw new Error('El servicio de Wispro no respondió bien (HTTP '+r.status+'). Revisá wisproUrl en firebase-config.js y que la función esté desplegada (firebase deploy --only functions).');
+ if(!r.ok||p.error)throw new Error(p.error||('Error HTTP '+r.status));
+ return p;
+}
+const WKEYS=['nombre','direccion','telefono','email','plan','origen','wisproId','publicId','customId','wisproContratos'];
+const wPick=o=>Object.fromEntries(WKEYS.map(k=>[k,o[k]??(k==='wisproContratos'?[]:'')]));
+async function importarWispro(){
+ const st=$('#wispro-st');
+ if(!db||!isAdmin){toast('Solo un administrador puede sincronizar');return}
+ st.textContent='Conectando con Wispro…';
+ try{
+  const prev=new Map(S.cli.map(c=>[c.id,c]));
+  wisproCache={clientes:[]};
+  let page=1,pages=1,vistos=0,escritos=0,iguales=0,sinId=0;
+  do{
+   const p=await wApi({mode:'sync',page,per_page:300});
+   pages=p.totalPages||1;
+   wisproCache.clientes.push(...p.clientes);
+   const cambios=[];
+   for(const c of p.clientes){
+    if(!c.wisproId){sinId++;continue}
+    const id='wispro_'+String(c.wisproId).replace(/[^a-zA-Z0-9_-]/g,'_');
+    const reg={nombre:c.nombre||'Cliente sin nombre',direccion:c.direccion||'',telefono:c.telefono||'',email:c.email||'',plan:c.plan||'',origen:'wispro',wisproId:String(c.wisproId),publicId:String(c.publicId??''),customId:String(c.customId??''),wisproContratos:c.contratos||[]};
+    const ant=prev.get(id);
+    if(ant&&JSON.stringify(wPick(ant))===JSON.stringify(wPick(reg))){iguales++;continue}
+    cambios.push([id,reg]);
+   }
+   for(let i=0;i<cambios.length;i+=20){
+    await Promise.all(cambios.slice(i,i+20).map(([id,reg])=>db.doc('clientes/'+id).set({...reg,wisproActualizadoAt:Date.now()})));
+    escritos+=Math.min(20,cambios.length-i);
+   }
+   vistos+=p.clientes.length;
+   st.textContent=`Sincronizando… página ${page} de ${pages} · ${vistos} clientes leídos · ${escritos} guardados`;
+   page++;
+  }while(page<=pages);
+  st.textContent=`Listo. Clientes leídos: ${vistos}. Guardados o actualizados: ${escritos}. Sin cambios: ${iguales}. Omitidos sin ID: ${sinId}.`;
+  toast('Wispro sincronizado: '+escritos+' cambios');
+ }catch(e){
+  console.error('Error sincronizando Wispro',e);
+  st.textContent='No se pudo sincronizar con Wispro: '+(e.message||'error desconocido');
+ }
+}
+function descargarWisproJSON(){
+ if(!wisproCache){toast('Primero sincronizá con Wispro');return}
+ const blob=new Blob([JSON.stringify(wisproCache,null,2)],{type:'application/json;charset=utf-8'});
+ const url=URL.createObjectURL(blob),a=document.createElement('a');
+ a.href=url;a.download='wispro-clientes.json';document.body.appendChild(a);a.click();a.remove();
+ setTimeout(()=>URL.revokeObjectURL(url),4000);
+}
+function fichaWispro(c){
+ const idc=c.customId||c.publicId;
+ return `<div class="row"><b>${esc(c.nombre)}</b>${idc?`<span class="chip">ID ${esc(idc)}</span>`:''}</div>
+ <div class="mut">${esc(c.email||'sin email')}${c.telefono?' · '+esc(c.telefono):''}</div>
+ <div>${esc(c.direccion||'sin dirección')} ${c.direccion?`<a target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(c.direccion)}">📍</a>`:''}</div>
+ ${(c.contratos||[]).map(k=>`<div class="note"><b>${esc(k.plan||'Sin plan')}</b> · ${esc(k.estado)}<br>Servidor: ${esc(k.servidor||'—')} · IP: <b>${esc(k.ip||'—')}</b>${k.mac?' · MAC '+esc(k.mac):''}<br>PPPoE usuario: <code>${esc(k.pppoeUser||'—')}</code> · contraseña: ${k.pppoePass?`<code class="pw" data-pw="${esc(k.pppoePass)}">••••••</code> <button data-act="pw">👁</button>`:'—'}</div>`).join('')||'<div class="mut">Sin contratos.</div>'}`;
+}
+const GAL={despacho:'Adjuntos del despacho',cierre:'Fotos del cierre',firma:'Firma del cliente',firmaTec:'Firma del técnico'};
+function galeria(id){
+ const g=ph[id];
+ if(!g)return '';
+ if(g==='load')return '<div class="ph"><span class="mut">Cargando…</span></div>';
+ if(!g.length)return '<div class="ph"><span class="mut">Sin imágenes.</span></div>';
+ return Object.keys(GAL).map(k=>{const l2=g.filter(x=>(x.tipo||'cierre')===k);return l2.length?`<div class="mut">${GAL[k]}</div><div class="ph">${l2.map(x=>`<img class="th" src="${esc(x.data)}" alt="${k}">`).join('')}</div>`:''}).join('');
+}
+function histCards(l){
+ return [...l].sort((a,b)=>(b.resueltaAt||0)-(a.resueltaAt||0)).map(a=>`<div class="note"><b>${a.resueltaAt?esc(new Date(a.resueltaAt).toLocaleDateString('es-AR')):'—'}</b> · 👷 ${esc((a.tecnicos||[]).map(nm).join(', ')||'—')}<br>${esc(a.problema)}${a.informe?`<br><b>Informe:</b> ${esc(a.informe)}`:''}${a.ubicacionCierre&&a.ubicacionCierre.lat?` <a target="_blank" rel="noopener" href="https://www.google.com/maps?q=${Number(a.ubicacionCierre.lat)},${Number(a.ubicacionCierre.lng)}">📍</a>`:''}${a.ticket&&/^https?:\/\//i.test(a.ticket)?` <a target="_blank" rel="noopener" href="${esc(a.ticket)}">🎫</a>`:''}${(a.nFotos||a.nFotosDesp||a.tieneFirma||a.tieneFirmaTec)?`<br><button data-act="fotos" data-id="${a.id}">📷 ${ph[a.id]?'Ocultar':'Ver'} imágenes</button>`:''}${galeria(a.id)}</div>`).join('');
+}
+function histBlock(wid){
+ const h=hist[wid];
+ if(!h)return '';
+ if(h==='load')return '<div class="mut">Cargando tareas…</div>';
+ return h.length?histCards(h):'<div class="mut">Sin tareas realizadas registradas para este cliente.</div>';
+}
+function renderBus(){
+ const st=$('#b-st'),box=$('#b-res');
+ if(!st||!box)return;
+ st.textContent=busSt;
+ box.innerHTML=busRes.map(c=>`<div class="card">${fichaWispro(c)}<div class="row" style="margin-top:8px"><button data-act="hist" data-wid="${esc(c.wisproId)}">📋 ${hist[c.wisproId]&&hist[c.wisproId]!=='load'?'Ocultar':'Ver'} tareas realizadas</button></div>${histBlock(c.wisproId)}</div>`).join('');
+}
+let busT=null;
+async function buscarWispro(q){
+ try{
+  const p=await wApi({mode:'buscar',q});
+  if(q!==busQ)return;
+  busRes=p.clientes||[];
+  busSt=busRes.length?busRes.length+' cliente(s) encontrados':'Sin resultados.';
+ }catch(e){busRes=[];busSt='No se pudo buscar: '+(e.message||'error')}
+ renderBus();
+}
+$('#b-q').addEventListener('input',e=>{
+ clearTimeout(busT);
+ busQ=e.target.value.trim();
+ if(busQ.length<2){busRes=[];busSt=busQ?'Escribí al menos 2 letras…':'';renderBus();return}
+ busSt='Buscando en Wispro…';renderBus();
+ const q=busQ;busT=setTimeout(()=>buscarWispro(q),450);
+});
+
+document.addEventListener('click',async e=>{
+ if(e.target.classList&&e.target.classList.contains('th')){e.target.classList.toggle('big');return}
+ const bar=e.target.closest('[data-aid]');
+ if(bar&&isAdmin){const aa=S.asi.find(x=>x.id===bar.dataset.aid);if(aa){if(aa.fecha)cday=aa.fecha;if(!(aa.tecnicos||[]).length&&aa.estado!=='Resuelta')editing=aa.id;render();return}}
+ const dd=e.target.closest('[data-day]');if(dd){cday=dd.dataset.day;render();return}
+ const b=e.target.closest('button');if(!b)return;
+ if(b.dataset.cal!==undefined){const n=+b.dataset.cal;if(n===0){cm=new Date();cm.setDate(1);cday=ymd(new Date())}else cm=new Date(cm.getFullYear(),cm.getMonth()+n,1);render();return}
+ if(b.dataset.tab){tab=b.dataset.tab;render();return}
+ if(b.dataset.fil){fil=b.dataset.fil;render();return}
+ if(b.dataset.del){
+  if(!b.dataset.armed){b.dataset.armed=1;b.textContent='¿Seguro?';setTimeout(()=>{b.dataset.armed='';b.textContent='Borrar'},3000);return}
+  w(()=>db.doc(b.dataset.del).delete());return}
+ const a=b.dataset.act;if(!a||!db)return;
+ if(a==='pw'){const cd=b.parentElement.querySelector('code.pw');if(cd)cd.textContent=cd.textContent==='••••••'?cd.dataset.pw:'••••••';return}
+ if(a==='hist'){
+  const wid=b.dataset.wid;
+  if(hist[wid]&&hist[wid]!=='load'){delete hist[wid];renderBus();return}
+  hist[wid]='load';renderBus();
+  try{
+   const cid='wispro_'+wid.replace(/[^a-zA-Z0-9_-]/g,'_');
+   const sn=await db.collection('asistencias').q([['clienteId','==',cid],['estado','==','Resuelta']]).get();
+   hist[wid]=sn.docs.map(d=>Object.assign({id:d.id},d.data()));
+  }catch(x){delete hist[wid];toast('No se pudo cargar el historial ('+((x&&x.code)||'error')+')',6000)}
+  renderBus();return}
+ if(a==='red'){
+  const aid=b.dataset.id,as=S.asi.find(x=>x.id===aid);
+  if(!as)return;
+  if(redInfo[aid]){delete redInfo[aid];render();return}
+  redInfo[aid]='load';render();
+  try{const p=await wApi({mode:'cliente',id:String(as.clienteId).replace(/^wispro_/,'')});redInfo[aid]=p.cliente}
+  catch(x){redInfo[aid]={error:(x&&x.message)||'error'}}
+  render();return}
+ if(a==='wispro'){await importarWispro();return}
+ if(a==='wispro-campos'){try{const p=await wApi({mode:'campos'});$('#wispro-st').textContent='Campos de cliente: '+p.camposCliente.join(', ')+' | Campos de contrato: '+p.camposContrato.join(', ')}catch(e){$('#wispro-st').textContent='No se pudo consultar: '+(e.message||'error')}return}
+ if(a==='wispro-json'){descargarWisproJSON();return}
+ if(a==='addcli'){
+  const nombre=$('#c-nom').value.trim();if(!nombre)return toast('Falta el nombre');
+  w(async()=>{await db.doc('clientes/'+uid('c')).set({nombre,direccion:$('#c-dir').value.trim(),telefono:$('#c-tel').value.trim(),plan:$('#c-plan').value.trim(),email:$('#c-email').value.trim()});['c-nom','c-dir','c-tel','c-plan','c-email'].forEach(i=>$('#'+i).value='');toast('Cliente guardado')})}
+ if(a==='addtec'){
+  const nombre=$('#t-nom').value.trim(),email=$('#t-mail').value.trim(),pass=$('#t-pass').value;
+  if(!nombre||!email||pass.length<6)return toast('Completá nombre, email y contraseña (mín. 6)');
+  w(async()=>{const cred=await createUserWithEmailAndPassword(auth2,email,pass),id=cred.user.uid;await signOut(auth2);
+   await db.doc('usuarios/'+id).set({rol:'tecnico',nombre,email});
+   await db.doc('tecnicos/'+id).set({nombre,email,userId:id});
+   ['t-nom','t-mail','t-pass'].forEach(i=>$('#'+i).value='');toast('Técnico creado')})}
+ if(a==='crear'){
+  const c=S.cli.find(c=>lab(c)===$('#cli').value.trim());
+  const ids=[...document.querySelectorAll('#tchk input:checked')].map(i=>i.value);
+  const problema=$('#prob').value.trim();
+  if(!c)return toast('Elegí un cliente de la lista');
+  if(!problema)return toast('Describí el problema');
+  const tk=$('#tkt').value.trim();if(tk&&!/^https?:\/\//i.test(tk))return toast('El link del ticket tiene que empezar con http:// o https://');let ub=despLoc;const ut=$('#ubic').value.trim();if(ut){ub=parseUbic(ut);if(!ub)return toast('No pude leer la ubicación. Pegá coordenadas (-34.45,-58.67) o un enlace largo de Google Maps')}
+  w(async()=>{const aid=uid('a'),files=[...$('#desp-file').files],imgs=[];
+  if(files.length)toast('Procesando imágenes…');
+  for(const f of files){try{imgs.push(await shrink(f))}catch(e){return toast('No se pudo leer una imagen ('+((e&&e.message)||'error')+')',6000)}}
+  await db.doc('asistencias/'+aid).set({clienteId:c.id,clienteNombre:c.nombre,clienteEmail:c.email||'',direccion:c.direccion||'',telefono:c.telefono||'',problema,prioridad:$('#pri').value,fecha:$('#fec').value,hora:$('#hor').value,horaFin:$('#hor2').value,ubicacion:ub||null,creadoPor:myId,creadoPorNombre:myName,tecnicos:ids,estado:'Pendiente',notas:[],nFotosDesp:0,ticket:tk,createdAt:Date.now()});
+  $('#cli').value='';$('#prob').value='';$('#ubic').value='';$('#ubic-st').textContent='';despLoc=null;$('#tkt').value='';$('#desp-file').value='';$('#desp-n').textContent='';document.querySelectorAll('#tchk input').forEach(i=>i.checked=false);
+  let nd=0,fail='';
+  for(const data of imgs){try{await db.collection('fotos').add({asistId:aid,tipo:'despacho',data,t:Date.now(),by:myId});nd++}catch(e){fail=(e&&e.code)||(e&&e.message)||'error';console.error('imagen del despacho',e);break}}
+  if(nd)await db.doc('asistencias/'+aid).update({nFotosDesp:nd});
+  if(fail)toast('La asistencia se creó, pero no se pudieron subir las imágenes ('+fail+')',9000);
+  else toast(ids.length?'Asistencia asignada':'Asistencia cargada sin técnico: asignala desde el calendario');
+ })}
+ if(a==='fotos'){const id=b.dataset.id;if(ph[id]){delete ph[id];render();return}ph[id]='load';render();
+  try{const sn=await db.collection('fotos').where('asistId','==',id).get();ph[id]=sn.docs.map(d=>d.data()).filter(x=>typeof x.data==='string'&&x.data.startsWith('data:image/'))}catch(x){delete ph[id];toast('No se pudieron cargar las fotos')}render();return}
+ if(a==='fin'){const fid=b.dataset.id;finishing=finishing===fid?null:fid;finTxt='';finFiles=[];finSig='';finSigT='';finFirmante='';finLoc='';finSend=false;const fa=S.asi.find(x=>x.id===fid);finMail=(fa&&fa.clienteEmail)||'';render();if(finishing)getPos().then(p=>{finLoc=p||'x';render()});return}
+ if(a==='sigclear'){finSig='';render();return}
+ if(a==='sigclearT'){finSigT='';render();return}
+ if(a==='mipos'){toast('Obteniendo ubicación…');getPos().then(p=>{if(!p)return toast('No pude obtener la ubicación. Permití el acceso en el navegador.');despLoc={lat:p.lat,lng:p.lng,acc:p.acc};$('#ubic').value=p.lat.toFixed(6)+', '+p.lng.toFixed(6);$('#ubic-st').textContent='📍 Ubicación actual cargada (±'+Math.round(p.acc)+' m)'});return}
+ if(a==='pdf'||a==='enviar'){const fa=S.asi.find(x=>x.id===b.dataset.id);if(fa)entregar(fa,a==='enviar');return}
+ if(a==='finclear'){finFiles=[];render();return}
+ if(a==='finsave'){finalizar(b.dataset.id);return}
+ if(a==='vinc'){linking=b.dataset.id;const t=S.tec.find(x=>x.id===linking);$('#link-t').textContent='Vincular cuenta a '+(t?t.nombre:'');$('#linkbox').hidden=false;$('#q-user').value='';buscar('');return}
+ if(a==='vcancel'){linking=null;$('#linkbox').hidden=true;return}
+ if(a==='vpick'){const uidp=b.dataset.uid;w(async()=>{await db.doc('tecnicos/'+linking).update({userId:uidp});linking=null;$('#linkbox').hidden=true;toast('Cuenta vinculada')});return}
+ if(a==='unvinc'){w(()=>db.doc('tecnicos/'+b.dataset.id).update({userId:null}));return}
+ if(a==='reasig'){editing=editing===b.dataset.id?null:b.dataset.id;pending=false;render();return}
+ if(a==='savereasig'){
+  const id=b.dataset.id,ids=[...document.querySelectorAll(`#s-${tab} [data-reasig="${id}"] input:checked`)].map(i=>i.value);
+  if(!ids.length)return toast('Dejá al menos un técnico');
+  const as=S.asi.find(x=>x.id===id);
+  w(async()=>{await db.doc('asistencias/'+id).update({tecnicos:ids,notas:[...(as.notas||[]),{txt:((as.tecnicos||[]).length?'Reasignada a: ':'Asignada a: ')+ids.map(nm).join(', '),t:Date.now(),by:me?nm(me):'Despacho'}]});editing=null;render();toast('Técnicos actualizados')});return}
+ if(a==='nota'){
+  const inp=document.querySelector(`#s-${tab} [data-note="${b.dataset.id}"]`),txt=inp.value.trim();if(!txt)return;
+  const as=S.asi.find(x=>x.id===b.dataset.id);
+  w(async()=>{await db.doc('asistencias/'+b.dataset.id).update({notas:[...(as.notas||[]),{txt,t:Date.now(),by:me?nm(me):'Despacho'}]});inp.value=''})}
+});
+document.addEventListener('change',e=>{
+ const t=e.target;
+ if(t.classList&&t.classList.contains('fin-file')){const fl=[...t.files];finProc++;toast('Procesando fotos…');
+  (async()=>{for(const f of fl){try{finFiles.push(await shrink(f))}catch(x){toast('No se pudo leer una foto ('+((x&&x.message)||'error')+')',6000)}}finProc--;render()})();return}
+ if(t.id==='desp-file'){$('#desp-n').textContent=t.files.length?t.files.length+' imagen(es)':'';return}
+ if(t.dataset&&'finsend' in t.dataset){finSend=t.checked;return}
+ if(t.id==='ctec'){ctec=t.value;render();return}
+ if(t.id==='csv'){if(t.files&&t.files[0])importCSV(t.files[0]);t.value='';return}
+ if(t.id==='me'){me=t.value;try{localStorage.setItem('me',me)}catch(x){}render();return}
+ if(t.dataset&&t.dataset.act==='estado'&&db)w(()=>db.doc('asistencias/'+t.dataset.id).update({estado:t.value}));
+});
+$('#c-q').addEventListener('input',render);
+document.addEventListener('input',e=>{const d=e.target.dataset;if(!d)return;if('fintxt' in d)finTxt=e.target.value;if('finfirmante' in d)finFirmante=e.target.value;if('finmail' in d)finMail=e.target.value});
+document.addEventListener('focusout',()=>{if(pending)setTimeout(render,50)});
+
+const fbApp=initializeApp(firebaseConfig),auth=getAuth(fbApp),fdb=getFirestore(fbApp);
+const auth2=getAuth(initializeApp(firebaseConfig,'sec'));
+const dbA={
+ doc:p=>({set:d=>setDoc(fdoc(fdb,p),d),update:d=>updateDoc(fdoc(fdb,p),d),delete:()=>deleteDoc(fdoc(fdb,p))}),
+ collection:(c,flt)=>({
+  onSnapshot:(ok,err)=>fsnap(flt?fquery(fcol(fdb,c),fwhere(...flt)):fcol(fdb,c),sn=>ok({docs:sn.docs}),err),
+  add:d=>addDoc(fcol(fdb,c),d),
+  q:conds=>({get:()=>getDocs(fquery(fcol(fdb,c),...conds.map(x=>fwhere(...x))))}),
+  where:(f,o,v)=>({get:()=>getDocs(fquery(fcol(fdb,c),fwhere(f,o,v)))})
+ })
+};
+let unsubs=[],loginMsg='';
+function loginUI(show,msg){$('#login').hidden=!show;$('#out').hidden=show;$('#login-err').textContent=msg||''}
+async function doLogin(){
+ const em=$('#l-mail').value.trim(),pw=$('#l-pass').value;
+ if(!em||!pw)return;
+ $('#login-err').textContent='';
+ if(/PEGAR/.test(firebaseConfig.apiKey||'')){$('#login-err').textContent='Falta configurar firebase-config.js: tiene los valores de ejemplo.';return}
+ try{await signInWithEmailAndPassword(auth,em,pw)}catch(e){const c=(e&&e.code)||'';$('#login-err').textContent=['auth/invalid-credential','auth/wrong-password','auth/user-not-found','auth/invalid-email'].includes(c)?'Email o contraseña incorrectos.':'No se pudo ingresar ('+(c||(e&&e.message))+').'}
+}
+$('#login-btn').addEventListener('click',doLogin);
+$('#l-pass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()});
+$('#out').addEventListener('click',()=>signOut(auth));
+$('#ubic').addEventListener('input',()=>{despLoc=null;$('#ubic-st').textContent=''});
+$('#done-send').addEventListener('click',()=>{if(doneA)entregar(doneA,true)});
+$('#done-pdf').addEventListener('click',()=>{if(doneA)entregar(doneA,false)});
+$('#done-close').addEventListener('click',()=>{$('#done').hidden=true;doneA=null});
+onAuthStateChanged(auth,async u=>{
+ unsubs.forEach(f=>f());unsubs=[];
+ S.cli=[];S.tec=[];S.asi=[];busRes=[];hist={};redInfo={};db=null;isAdmin=false;myId=null;me='';editing=null;finishing=null;
+ if(!u){loginUI(true,loginMsg);loginMsg='';return}
+ let info=null,errc='';
+ try{const sn=await getDoc(fdoc(fdb,'usuarios/'+u.uid));info=sn.exists()?sn.data():null;if(!info)errc='no existe la ficha para el UID '+u.uid}catch(e){errc='error '+(e.code||e.message);console.error(e)}
+ if(!info){loginMsg='Tu usuario no está habilitado ('+errc+').';signOut(auth);return}
+ isAdmin=info.rol==='admin';myId=u.uid;myName=info.nombre||u.email||'';db=dbA;
+ tab=isAdmin?'cal':'mi';$('#fec').value=ymd(new Date());
+ loginUI(false);render();
+ const subs=[['tecnicos','tec'],['asistencias','asi']];
+ if(isAdmin)subs.push(['clientes','cli']);
+ subs.forEach(([c,k])=>{
+  const flt=(c==='asistencias'&&!isAdmin)?['tecnicos','array-contains',u.uid]:null;
+  unsubs.push(db.collection(c,flt).onSnapshot(sn=>{S[k]=sn.docs.map(d=>Object.assign({id:d.id},d.data()));render()},()=>{}));
+ });
+});
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+
+</body></html>
